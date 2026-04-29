@@ -5,4 +5,6 @@ module mx.nanosip.nanosip {
 
     opens mx.nanosip.nanosip to javafx.fxml;
     exports mx.nanosip.nanosip;
+    exports mx.nanosip.nanosip.Controllers;
+    opens mx.nanosip.nanosip.Controllers to javafx.fxml;
 }

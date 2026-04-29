@@ -1,4 +1,4 @@
-package mx.nanosip.nanosip;
+package mx.nanosip.nanosip.Controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
