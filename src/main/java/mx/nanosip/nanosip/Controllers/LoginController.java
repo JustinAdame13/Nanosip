@@ -2,6 +2,7 @@ package mx.nanosip.nanosip.Controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import mx.nanosip.nanosip.App;
 
@@ -11,7 +12,7 @@ public class LoginController {
     @FXML
     private TextField IDField;
     @FXML
-    private TextField PasswordField;
+    private PasswordField PasswordField;
     @FXML
     private Button btnIngresar;
 
