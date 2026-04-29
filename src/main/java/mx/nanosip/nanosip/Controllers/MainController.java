@@ -24,6 +24,11 @@ public class MainController {
     }
     @FXML
     public void VentanaEmpleados(){
+        try {
+            App.setRoot("Empleados.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
     @FXML

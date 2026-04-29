@@ -1,0 +1,207 @@
+/* ── Variables de color ── */
+.root {
+    -fx-background-color: #F4F5F7;
+    -color-bg:        #F4F5F7;
+    -color-surface:   #FFFFFF;
+    -color-topbar:    #1A1D2E;
+    -color-accent:    #4F6EF7;
+    -color-danger:    #E5534B;
+    -color-warning:   #D97706;
+    -color-success:   #22C55E;
+    -color-text:      #1A1D2E;
+    -color-muted:     #6B7280;
+    -color-border:    #E2E8F0;
+    -color-dock:      #1A1D2Eee;
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR
+   ══════════════════════════════════════════ */
+.topbar {
+    -fx-background-color: -color-topbar;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 10, 0, 0, 2);
+}
+
+.topbar-title {
+    -fx-text-fill: white;
+    -fx-font-family: "Segoe UI Semibold", "SF Pro Display", sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-opacity: 0.95;
+}
+
+/* ── Botones de acción (topbar) ── */
+.topbtn {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-cursor: hand;
+    -fx-padding: 6 14 6 14;
+    -fx-border-width: 1;
+    -fx-transition: all 0.15s ease;
+}
+.topbtn:hover {
+    -fx-opacity: 0.85;
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+}
+.topbtn:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.topbtn-report {
+    -fx-background-color: #2D3250;
+    -fx-text-fill: #A5B4FC;
+    -fx-border-color: #4F6EF7;
+}
+.topbtn-create {
+    -fx-background-color: -color-success;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+.topbtn-edit {
+    -fx-background-color: -color-warning;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+.topbtn-delete {
+    -fx-background-color: -color-danger;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+/* ── Botones ventana (min/close) ── */
+.wmbtn {
+    -fx-background-radius: 50%;
+    -fx-min-width: 20px;
+    -fx-min-height: 20px;
+    -fx-max-width: 20px;
+    -fx-max-height: 20px;
+    -fx-font-size: 10px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+}
+.wmbtn-min {
+    -fx-background-color: #F59E0B;
+    -fx-text-fill: #7C4700;
+}
+.wmbtn-close {
+    -fx-background-color: -color-danger;
+    -fx-text-fill: white;
+}
+.wmbtn:hover { -fx-opacity: 0.8; }
+
+/* ══════════════════════════════════════════
+   ÁREA CENTRAL
+   ══════════════════════════════════════════ */
+.content-area {
+    -fx-background-color: -color-bg;
+}
+
+/* ── Barra de búsqueda ── */
+.search-field {
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 8;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 8 12 8 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);
+}
+.search-field:focused {
+    -fx-border-color: -color-accent;
+    -fx-effect: dropshadow(gaussian, rgba(79,110,247,0.25), 10, 0, 0, 0);
+}
+
+/* ── Tabla ── */
+.emp-table {
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);
+}
+.emp-table .column-header-background {
+    -fx-background-color: #EEF2FF;
+    -fx-background-radius: 10 10 0 0;
+}
+.emp-table .column-header .label {
+    -fx-text-fill: -color-accent;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.emp-table .table-row-cell:odd {
+    -fx-background-color: #F8FAFF;
+}
+.emp-table .table-row-cell:selected {
+    -fx-background-color: #DBEAFE;
+}
+.emp-table .table-row-cell:hover {
+    -fx-background-color: #EFF6FF;
+}
+
+/* ══════════════════════════════════════════
+   DOCK INFERIOR (barra de atajos)
+   ══════════════════════════════════════════ */
+
+/* El wrapper define el espacio visible (~8px de "lengüeta") */
+.dock-wrapper {
+    -fx-background-color: transparent;
+    -fx-pref-height: 8px;
+    /* La transición del tamaño se maneja desde Java con Timeline */
+}
+
+/* La barra real con los botones */
+.dock-bar {
+    -fx-background-color: -color-dock;
+    -fx-background-radius: 14 14 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 18, 0, 0, -4);
+    /* translateY se anima desde el controller */
+}
+
+/* ── Botones del dock ── */
+.dockbtn {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-text-fill: rgba(255,255,255,0.75);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.dockbtn:hover {
+    -fx-background-color: rgba(79,110,247,0.35);
+    -fx-text-fill: white;
+    -fx-border-color: -color-accent;
+}
+.dockbtn:pressed {
+    -fx-background-color: rgba(79,110,247,0.6);
+}
+
+/* Botón activo (sección actual) */
+.dockbtn-active {
+    -fx-background-color: -color-accent;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+/* Botón cerrar sesión */
+.dockbtn-session {
+    -fx-background-color: rgba(229,83,75,0.2);
+    -fx-text-fill: #FCA5A5;
+    -fx-border-color: rgba(229,83,75,0.4);
+}
+.dockbtn-session:hover {
+    -fx-background-color: -color-danger;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
