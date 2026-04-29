@@ -205,3 +205,12 @@
     -fx-text-fill: white;
     -fx-border-color: transparent;
 }
+.dock-handle {
+    -fx-text-fill: rgba(255, 255, 255, 0.45);
+    -fx-font-size: 10px;
+    -fx-letter-spacing: 3px;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 4px;
+    -fx-padding: 1 10 1 10;
+    -fx-cursor: default;
+}

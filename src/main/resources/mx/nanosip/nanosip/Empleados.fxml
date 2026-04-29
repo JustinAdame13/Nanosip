@@ -84,35 +84,35 @@
     ═══════════════════════════════════════════ -->
     <bottom>
         <!-- Contenedor externo que fija la altura visible -->
-        <StackPane fx:id="dockWrapper"
-                   prefHeight="8.0"
-                   styleClass="dock-wrapper"
-                   onMouseEntered="#mostrarDock"
-                   onMouseExited="#ocultarDock">
+       <StackPane fx:id="dockWrapper"
+                  prefHeight="8.0"
+                  styleClass="dock-wrapper"
+                  onMouseEntered="#mostrarDock"
+                  onMouseExited="#ocultarDock">
 
-            <!-- Panel deslizable con los botones -->
-            <HBox fx:id="dockBar"
-                  alignment="CENTER"
-                  spacing="12"
-                  styleClass="dock-bar"
-                  prefHeight="56.0"
-                  translateY="48.0">   <!-- empieza casi oculto (56-8 = 48 px abajo) -->
-                <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
+          <!-- Pastilla indicadora (siempre visible) -->
+          <Label styleClass="dock-handle" text="&#8212;&#8212;&#8212;"
+                 StackPane.alignment="TOP_CENTER"
+                 translateY="-2"/>
 
-                <!-- Botones de navegación rápida -->
-                <Button fx:id="dockEmpleados"  text="👤 Empleados"  styleClass="dockbtn, dockbtn-active"   onAction="#irEmpleados"/>
-                <Button fx:id="dockVentas"     text="💰 Ventas"     styleClass="dockbtn"                   onAction="#irVentas"/>
-                <Button fx:id="dockClientes"   text="🏢 Clientes"   styleClass="dockbtn"                   onAction="#irClientes"/>
-                <Button fx:id="dockProductos"  text="📦 Productos"  styleClass="dockbtn"                   onAction="#irProductos"/>
-                <Button fx:id="dockProveed"    text="🚚 Proveed."   styleClass="dockbtn"                   onAction="#irProveedores"/>
+          <!-- Panel deslizable con los botones -->
+          <HBox fx:id="dockBar"
+                alignment="CENTER"
+                spacing="12"
+                styleClass="dock-bar"
+                prefHeight="56.0"
+                translateY="48.0">
+             <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
 
-                <!-- Separador visual -->
-                <HBox HBox.hgrow="ALWAYS"/>
-
-                <!-- Cerrar sesión -->
-                <Button fx:id="dockSesion"     text="🔒 Sesión"     styleClass="dockbtn, dockbtn-session"  onAction="#cerrarSesion"/>
-            </HBox>
-        </StackPane>
+             <Button fx:id="dockEmpleados"  text="👤 Empleados"  styleClass="dockbtn, dockbtn-active"   onAction="#irEmpleados"/>
+             <Button fx:id="dockVentas"     text="💰 Ventas"     styleClass="dockbtn"                   onAction="#irVentas"/>
+             <Button fx:id="dockClientes"   text="🏢 Clientes"   styleClass="dockbtn"                   onAction="#irClientes"/>
+             <Button fx:id="dockProductos"  text="📦 Productos"  styleClass="dockbtn"                   onAction="#irProductos"/>
+             <Button fx:id="dockProveed"    text="🚚 Proveed."   styleClass="dockbtn"                   onAction="#irProveedores"/>
+             <HBox HBox.hgrow="ALWAYS"/>
+             <Button fx:id="dockSesion"     text="🔒 Sesión"     styleClass="dockbtn, dockbtn-session"  onAction="#cerrarSesion"/>
+          </HBox>
+       </StackPane>
     </bottom>
 
 </BorderPane>
