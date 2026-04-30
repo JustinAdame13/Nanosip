@@ -2,7 +2,7 @@
    VARIABLES DE COLOR — Paleta Nanosip
    ══════════════════════════════════════════ */
 .root {
-    -fx-background-color: #F5F3FA;
+    -fx-background-color: transparent;
 
     -color-bg:        #F5F3FA;
     -color-surface:   #FFFFFF;
@@ -17,8 +17,8 @@
     -color-dock:      #2E2648;
 }
 .root-pane {
+    -fx-background-color: #F5F3FA;
     -fx-background-radius: 12;
-    -fx-border-radius: 12;
     -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.45), 20, 0, 0, 4);
 }
 
@@ -27,6 +27,7 @@
    ══════════════════════════════════════════ */
 .topbar {
     -fx-background-color: #242038;
+    -fx-background-radius: 12 12 0 0;
     -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.4), 10, 0, 0, 3);
 }
 
@@ -182,12 +183,13 @@
    ══════════════════════════════════════════ */
 .dock-wrapper {
     -fx-background-color: transparent;
+    -fx-background-radius: 0 0 12 12;
     -fx-pref-height: 8px;
 }
 
 .dock-bar {
     -fx-background-color: #242038;
-    -fx-background-radius: 14 14 0 0;
+    -fx-background-radius: 14 14 12 12;
     -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.5), 18, 0, 0, -4);
 }
 
