@@ -1,14 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="620.0" prefWidth="900.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.VentasController">
 
-</AnchorPane>
+    <!-- ═══════════════════════════════════════════
+         TOP BAR: acciones principales
+    ═══════════════════════════════════════════ -->
+    <top>
+        <HBox fx:id="topbar" alignment="CENTER_LEFT" prefHeight="60.0" spacing="8" styleClass="topbar">
+            <padding><Insets bottom="10" left="16" right="16" top="10" /></padding>
+            <!-- Título de la sección -->
+            <Label styleClass="topbar-title" text="Empleados" />
+
+            <!-- Espaciador -->
+            <HBox HBox.hgrow="ALWAYS" />
+
+            <!-- Botones de acción -->
+            <Button fx:id="btnReporte" onAction="#generarReporte" styleClass="topbtn, topbtn-report" text="📄 Reporte" />
+            <Button fx:id="btnCrear" onAction="#crearEmpleado" styleClass="topbtn, topbtn-create" text="＋ Crear" />
+            <Button fx:id="btnEditar" onAction="#editarEmpleado" styleClass="topbtn, topbtn-edit" text="✎ Editar" />
+            <Button fx:id="btnEliminar" onAction="#eliminarEmpleado" styleClass="topbtn, topbtn-delete" text="✕ Eliminar" />
+
+            <!-- Espaciador -->
+            <HBox prefWidth="16" />
+
+            <!-- Minimizar / Cerrar -->
+            <Button fx:id="btnMinimizar" onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─" />
+            <Button fx:id="btnCerrar" onAction="#cerrar" styleClass="wmbtn, wmbtn-close" text="✕" />
+        </HBox>
+    </top>
+
+    <!-- ═══════════════════════════════════════════
+         CENTER: búsqueda + tabla
+    ═══════════════════════════════════════════ -->
+    <center>
+        <VBox spacing="10" styleClass="content-area">
+            <padding><Insets bottom="10" left="18" right="18" top="14" /></padding>
+
+            <!-- Barra de búsqueda -->
+            <TextField fx:id="txtBusqueda" promptText="🔍  Buscar empleado…" styleClass="search-field" />
+
+            <!-- Tabla de empleados -->
+            <TableView fx:id="tablaEmpleados" styleClass="emp-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" prefWidth="60" text="ID" />
+                    <TableColumn fx:id="colNombre" prefWidth="180" text="Nombre" />
+                    <TableColumn fx:id="colApellido" prefWidth="160" text="Apellido" />
+                    <TableColumn fx:id="colPuesto" prefWidth="160" text="Puesto" />
+                    <TableColumn fx:id="colEdad" prefWidth="130" text="Edad" />
+                    <TableColumn fx:id="curp" prefWidth="90" text="Estatus" />
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- ═══════════════════════════════════════════
+         BOTTOM: barra de atajos deslizable
+         Solo se muestran ~8 px (la "lengüeta") hasta
+         que el usuario pasa el cursor encima; entonces
+         la barra sube animada mostrando los botones.
+         La animación se maneja en EmpleadosController.
+    ═══════════════════════════════════════════ -->
+    <bottom>
+        <!-- Contenedor externo que fija la altura visible -->
+        <StackPane fx:id="dockWrapper" onMouseEntered="#mostrarDock" onMouseExited="#ocultarDock" prefHeight="8.0" styleClass="dock-wrapper">
+
+            <!-- Pastilla indicadora (siempre visible) -->
+            <Label styleClass="dock-handle" text="———" translateY="-2" StackPane.alignment="TOP_CENTER" />
+
+            <!-- Panel deslizable con los botones -->
+            <HBox fx:id="dockBar" alignment="CENTER" prefHeight="56.0" spacing="12" styleClass="dock-bar" translateY="48.0">
+                <padding><Insets bottom="8" left="20" right="20" top="8" /></padding>
+
+                <Button fx:id="dockEmpleados" onAction="#irEmpleados" styleClass="dockbtn, dockbtn-active" text="👤 Empleados" />
+                <Button fx:id="dockVentas" onAction="#irVentas" styleClass="dockbtn" text="💰 Ventas" />
+                <Button fx:id="dockClientes" onAction="#irClientes" styleClass="dockbtn" text="🏢 Clientes" />
+                <Button fx:id="dockProductos" onAction="#irProductos" styleClass="dockbtn" text="📦 Productos" />
+                <Button fx:id="dockProveed" onAction="#irProveedores" styleClass="dockbtn" text="🚚 Proveed." />
+                <HBox HBox.hgrow="ALWAYS" />
+                <Button fx:id="dockSesion" onAction="#cerrarSesion" styleClass="dockbtn, dockbtn-session" text="🔒 Sesión" />
+            </HBox>
+        </StackPane>
+    </bottom>
+
+</BorderPane>
