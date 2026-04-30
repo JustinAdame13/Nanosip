@@ -15,15 +15,15 @@ public class VentasController extends BaseController {
 
     // ── Contenido ────────────────────────────────────────────
     @FXML private TextField txtBusqueda;
-    @FXML private TableView<?> tablaEmpleados;
+    @FXML private TableView<?> tablaVentas;
 
     // ── Columnas ─────────────────────────────────────────────
-    @FXML private TableColumn<?, ?> colId;
-    @FXML private TableColumn<?, ?> colNombre;
-    @FXML private TableColumn<?, ?> colApellido;
-    @FXML private TableColumn<?, ?> colPuesto;
-    @FXML private TableColumn<?, ?> colDept;
-    @FXML private TableColumn<?, ?> colEstatus;
+    @FXML private TableColumn<?, ?> colNum;
+    @FXML private TableColumn<?, ?> colEmpleado;
+    @FXML private TableColumn<?, ?> colCliente;
+    @FXML private TableColumn<?, ?> colMonto;
+    @FXML private TableColumn<?, ?> colProducto;
+    @FXML private TableColumn<?, ?> colCantidad;
 
     // ─────────────────────────────────────────────────────────
     //  Inicialización
@@ -37,7 +37,7 @@ public class VentasController extends BaseController {
     //  Acciones propias
     // ─────────────────────────────────────────────────────────
     @FXML public void generarReporte()   { /* TODO */ }
-    @FXML public void crearEmpleado()    { /* TODO */ }
-    @FXML public void editarEmpleado()   { /* TODO */ }
-    @FXML public void eliminarEmpleado() { /* TODO */ }
+    @FXML public void crear()    { /* TODO */ }
+    @FXML public void editar()   { /* TODO */ }
+    @FXML public void eliminar() { /* TODO */ }
 }

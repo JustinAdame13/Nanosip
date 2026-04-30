@@ -9,7 +9,7 @@
    <center>
       <HBox alignment="CENTER" prefHeight="44.0" prefWidth="473.0" spacing="10" styleClass="Main-bar">
          <children>
-            <Button fx:id="dockSesion" onAction="#cerrarSesion" styleClass="dockbtn, dockbtn-session" text="🔒 Sesión" />
+            <Button fx:id="dockSesion" onAction="#cerrarSesion" styleClass="dockbtn" text="🔒 Sesión" />
             <Button fx:id="dockEmpleados" onAction="#irEmpleados" styleClass="dockbtn, dockbtn-active" text="👤 Empleados" />
             <Button fx:id="dockVentas" onAction="#irVentas" styleClass="dockbtn" text="💰 Ventas" />
             <Button fx:id="dockClientes" onAction="#irClientes" styleClass="dockbtn" text="🏢 Clientes" />
