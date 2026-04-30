@@ -18,8 +18,8 @@
 }
 .root-pane {
     -fx-background-color: #F5F3FA;
-    -fx-background-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.45), 20, 0, 0, 4);
+    -fx-background-radius: 16 16 16 16;
+
 }
 
 /* ══════════════════════════════════════════
@@ -190,7 +190,7 @@
 .dock-bar {
     -fx-background-color: #242038;
     -fx-background-radius: 14 14 12 12;
-    -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.5), 18, 0, 0, -4);
+    /*-fx-effect: dropshadow(gaussian, rgba(36,32,56,0.5), 18, 0, 0, -4);*/
 }
 
 /* ── Botones del dock ── */
