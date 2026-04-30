@@ -1,49 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Insets?>
 
-<BorderPane
-    prefHeight="620.0"
-    prefWidth="900.0"
-    stylesheets="@Styles.css"
-    xmlns="http://javafx.com/javafx/21"
-    xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="mx.nanosip.nanosip.Controllers.EmpleadosController">
+<BorderPane prefHeight="620.0" prefWidth="900.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.EmpleadosController">
 
     <!-- ═══════════════════════════════════════════
          TOP BAR: acciones principales
     ═══════════════════════════════════════════ -->
     <top>
-        <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="8" prefHeight="60.0">
-            <padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
+        <HBox fx:id="topbar" alignment="CENTER_LEFT" prefHeight="60.0" spacing="8" styleClass="topbar">
+            <padding><Insets bottom="10" left="16" right="16" top="10" /></padding>
             <!-- Título de la sección -->
-            <Label text="Empleados" styleClass="topbar-title"/>
+            <Label styleClass="topbar-title" text="Empleados" />
 
             <!-- Espaciador -->
-            <HBox HBox.hgrow="ALWAYS"/>
+            <HBox HBox.hgrow="ALWAYS" />
 
             <!-- Botones de acción -->
-            <Button fx:id="btnReporte"   text="📄 Reporte"  styleClass="topbtn, topbtn-report"  onAction="#generarReporte"/>
-            <Button fx:id="btnCrear"     text="＋ Crear"    styleClass="topbtn, topbtn-create"   onAction="#crearEmpleado"/>
-            <Button fx:id="btnEditar"    text="✎ Editar"   styleClass="topbtn, topbtn-edit"     onAction="#editarEmpleado"/>
-            <Button fx:id="btnEliminar"  text="✕ Eliminar" styleClass="topbtn, topbtn-delete"   onAction="#eliminarEmpleado"/>
+            <Button fx:id="btnReporte" onAction="#generarReporte" styleClass="topbtn, topbtn-report" text="📄 Reporte" />
+            <Button fx:id="btnCrear" onAction="#crearEmpleado" styleClass="topbtn, topbtn-create" text="＋ Crear" />
+            <Button fx:id="btnEditar" onAction="#editarEmpleado" styleClass="topbtn, topbtn-edit" text="✎ Editar" />
+            <Button fx:id="btnEliminar" onAction="#eliminarEmpleado" styleClass="topbtn, topbtn-delete" text="✕ Eliminar" />
 
             <!-- Espaciador -->
-            <HBox prefWidth="16"/>
+            <HBox prefWidth="16" />
 
             <!-- Minimizar / Cerrar -->
-            <Button fx:id="btnMinimizar" text="─" styleClass="wmbtn, wmbtn-min" onAction="#minimizar"/>
-            <Button fx:id="btnCerrar"    text="✕" styleClass="wmbtn, wmbtn-close" onAction="#cerrar"/>
+            <Button fx:id="btnMinimizar" onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─" />
+            <Button fx:id="btnCerrar" onAction="#cerrar" styleClass="wmbtn, wmbtn-close" text="✕" />
         </HBox>
     </top>
 
@@ -51,25 +44,21 @@
          CENTER: búsqueda + tabla
     ═══════════════════════════════════════════ -->
     <center>
-        <VBox styleClass="content-area" spacing="10">
-            <padding><Insets top="14" right="18" bottom="10" left="18"/></padding>
+        <VBox spacing="10" styleClass="content-area">
+            <padding><Insets bottom="10" left="18" right="18" top="14" /></padding>
 
             <!-- Barra de búsqueda -->
-            <TextField fx:id="txtBusqueda"
-                       promptText="🔍  Buscar empleado…"
-                       styleClass="search-field"/>
+            <TextField fx:id="txtBusqueda" promptText="🔍  Buscar empleado…" styleClass="search-field" />
 
             <!-- Tabla de empleados -->
-            <TableView fx:id="tablaEmpleados"
-                       VBox.vgrow="ALWAYS"
-                       styleClass="emp-table">
+            <TableView fx:id="tablaEmpleados" styleClass="emp-table" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="colId"        text="ID"         prefWidth="60"/>
-                    <TableColumn fx:id="colNombre"    text="Nombre"     prefWidth="180"/>
-                    <TableColumn fx:id="colApellido"  text="Apellido"   prefWidth="160"/>
-                    <TableColumn fx:id="colPuesto"    text="Puesto"     prefWidth="160"/>
-                    <TableColumn fx:id="colDept"      text="Depto."     prefWidth="130"/>
-                    <TableColumn fx:id="colEstatus"   text="Estatus"    prefWidth="90"/>
+                    <TableColumn fx:id="colId" prefWidth="60" text="ID" />
+                    <TableColumn fx:id="colNombre" prefWidth="180" text="Nombre" />
+                    <TableColumn fx:id="colApellido" prefWidth="160" text="Apellido" />
+                    <TableColumn fx:id="colPuesto" prefWidth="160" text="Puesto" />
+                    <TableColumn fx:id="colEdad" prefWidth="130" text="Edad" />
+                    <TableColumn fx:id="curp" prefWidth="90" text="Estatus" />
                 </columns>
             </TableView>
         </VBox>
@@ -84,33 +73,22 @@
     ═══════════════════════════════════════════ -->
     <bottom>
         <!-- Contenedor externo que fija la altura visible -->
-       <StackPane fx:id="dockWrapper"
-                  prefHeight="8.0"
-                  styleClass="dock-wrapper"
-                  onMouseEntered="#mostrarDock"
-                  onMouseExited="#ocultarDock">
+       <StackPane fx:id="dockWrapper" onMouseEntered="#mostrarDock" onMouseExited="#ocultarDock" prefHeight="8.0" styleClass="dock-wrapper">
 
           <!-- Pastilla indicadora (siempre visible) -->
-          <Label styleClass="dock-handle" text="&#8212;&#8212;&#8212;"
-                 StackPane.alignment="TOP_CENTER"
-                 translateY="-2"/>
+          <Label styleClass="dock-handle" text="———" translateY="-2" StackPane.alignment="TOP_CENTER" />
 
           <!-- Panel deslizable con los botones -->
-          <HBox fx:id="dockBar"
-                alignment="CENTER"
-                spacing="12"
-                styleClass="dock-bar"
-                prefHeight="56.0"
-                translateY="48.0">
-             <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
+          <HBox fx:id="dockBar" alignment="CENTER" prefHeight="56.0" spacing="12" styleClass="dock-bar" translateY="48.0">
+             <padding><Insets bottom="8" left="20" right="20" top="8" /></padding>
 
-             <Button fx:id="dockEmpleados"  text="👤 Empleados"  styleClass="dockbtn, dockbtn-active"   onAction="#irEmpleados"/>
-             <Button fx:id="dockVentas"     text="💰 Ventas"     styleClass="dockbtn"                   onAction="#irVentas"/>
-             <Button fx:id="dockClientes"   text="🏢 Clientes"   styleClass="dockbtn"                   onAction="#irClientes"/>
-             <Button fx:id="dockProductos"  text="📦 Productos"  styleClass="dockbtn"                   onAction="#irProductos"/>
-             <Button fx:id="dockProveed"    text="🚚 Proveed."   styleClass="dockbtn"                   onAction="#irProveedores"/>
-             <HBox HBox.hgrow="ALWAYS"/>
-             <Button fx:id="dockSesion"     text="🔒 Sesión"     styleClass="dockbtn, dockbtn-session"  onAction="#cerrarSesion"/>
+             <Button fx:id="dockEmpleados" onAction="#irEmpleados" styleClass="dockbtn, dockbtn-active" text="👤 Empleados" />
+             <Button fx:id="dockVentas" onAction="#irVentas" styleClass="dockbtn" text="💰 Ventas" />
+             <Button fx:id="dockClientes" onAction="#irClientes" styleClass="dockbtn" text="🏢 Clientes" />
+             <Button fx:id="dockProductos" onAction="#irProductos" styleClass="dockbtn" text="📦 Productos" />
+             <Button fx:id="dockProveed" onAction="#irProveedores" styleClass="dockbtn" text="🚚 Proveed." />
+             <HBox HBox.hgrow="ALWAYS" />
+             <Button fx:id="dockSesion" onAction="#cerrarSesion" styleClass="dockbtn, dockbtn-session" text="🔒 Sesión" />
           </HBox>
        </StackPane>
     </bottom>

@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import mx.nanosip.nanosip.App;
+import mx.nanosip.nanosip.WindowDragUtil;
 
 import java.io.IOException;
 
@@ -38,6 +39,7 @@ public class EmpleadosController {
     // ── Dock ─────────────────────────────────────────────────
     @FXML private StackPane dockWrapper;
     @FXML private HBox      dockBar;
+    @FXML private HBox topbar;
 
     /** Altura total del dock cuando está completamente visible (px) */
     private static final double DOCK_FULL   = 56.0;
@@ -65,6 +67,7 @@ public class EmpleadosController {
         dockWrapper.setMaxHeight(DOCK_FULL);   // permite crecer al hacer hover
 
         buildAnimations();
+        WindowDragUtil.enable(topbar, App.getStage());
     }
 
     // ─────────────────────────────────────────────────────────

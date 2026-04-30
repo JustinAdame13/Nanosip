@@ -4,9 +4,13 @@ import javafx.scene.control.Button;
 
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import mx.nanosip.nanosip.App;
+import mx.nanosip.nanosip.WindowDragUtil;
 
 import java.io.IOException;
+
 
 public class LoginController {
     @FXML
@@ -15,6 +19,14 @@ public class LoginController {
     private PasswordField PasswordField;
     @FXML
     private Button btnIngresar;
+    @FXML
+    private HBox topbar;
+
+
+    @FXML
+    public void initialize() {
+        WindowDragUtil.enable(topbar, App.getStage());
+    }
 
     @FXML
     public void Ingresar(){
@@ -29,6 +41,15 @@ public class LoginController {
             e.printStackTrace();
         }
 
+    }
+    @FXML public void minimizar() {
+        Stage stage = App.getStage();
+        if (stage != null) stage.setIconified(true);
+    }
+
+    @FXML public void cerrar() {
+        Stage stage = App.getStage();
+        if (stage != null) stage.close();
     }
 
 
