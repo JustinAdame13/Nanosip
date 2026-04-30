@@ -36,7 +36,7 @@ public class MainController {
         if (stage != null) stage.close();
     }
 
-    @FXML public void VolverLogin(){
+    @FXML public void cerrarSesion(){
         try {
             App.setRoot("Login.fxml");
         } catch (IOException e) {
@@ -44,7 +44,7 @@ public class MainController {
         }
     }
     @FXML
-    public void VentanaEmpleados(){
+    public void irEmpleados(){
         try {
             App.setRoot("Empleados.fxml");
         } catch (IOException e) {
@@ -53,20 +53,36 @@ public class MainController {
 
     }
     @FXML
-    public void VentanaVentas(){
-
+    public void irVentas(){
+        try {
+            App.setRoot("Ventas.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     @FXML
-    public void VentanaClientes(){
-
+    public void irClientes(){
+        try {
+            App.setRoot("Clientes.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     @FXML
-    public void VentanaProductos(){
-
+    public void irProductos(){
+        try {
+            App.setRoot("Productos.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     @FXML
-    public void VentanaProveedores(){
-
+    public void irProveedores(){
+        try {
+            App.setRoot("Proveedores.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
