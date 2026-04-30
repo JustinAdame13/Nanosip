@@ -16,9 +16,11 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         App.stage = stage;
-        stage.initStyle(StageStyle.UNDECORATED);
+        stage.initStyle(StageStyle.TRANSPARENT);
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("Login.fxml"));
+
         scene = new Scene(fxmlLoader.load());
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
 
         stage.setTitle("Nanosip");
         stage.setScene(scene);
