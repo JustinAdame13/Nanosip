@@ -251,6 +251,7 @@
    ══════════════════════════════════════════ */
 .login-card {
     -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0 0 12 12;
 }
 
 .login-title {
@@ -309,4 +310,5 @@
    .Main-bar{
    -fx-background-color: #242038;
    -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.5), 18, 0, 0, -4);
+   -fx-background-radius: 0 0 12 12;
    }
