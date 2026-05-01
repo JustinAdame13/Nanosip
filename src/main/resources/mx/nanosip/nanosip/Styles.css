@@ -321,3 +321,311 @@
        -fx-font-size: 11px;
        -fx-font-weight: bold;
    }
+   /* ══════════════════════════════════════════
+      SPINNER (modales)
+      ══════════════════════════════════════════ */
+   .modal-spinner {
+       -fx-background-color: #F5F3FA;
+       -fx-background-radius: 8;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+   }
+   .modal-spinner .text-field {
+       -fx-background-color: #F5F3FA;
+       -fx-font-size: 13px;
+       -fx-font-family: "Segoe UI", sans-serif;
+       -fx-padding: 8 4 8 12;
+   }
+   .modal-spinner:focused,
+   .modal-spinner .text-field:focused {
+       -fx-border-color: #725AC1;
+       -fx-effect: dropshadow(gaussian, rgba(114,90,193,0.25), 10, 0, 0, 0);
+   }
+   .modal-spinner .increment-arrow-button,
+   .modal-spinner .decrement-arrow-button {
+       -fx-background-color: #EDE9FA;
+       -fx-border-color: #E2DEEE;
+       -fx-border-width: 0 0 0 1.5;
+       -fx-cursor: hand;
+   }
+   .modal-spinner .increment-arrow-button:hover,
+   .modal-spinner .decrement-arrow-button:hover {
+       -fx-background-color: #725AC1;
+   }
+   .modal-spinner .increment-arrow,
+   .modal-spinner .decrement-arrow {
+       -fx-background-color: #725AC1;
+   }
+   .modal-spinner .increment-arrow-button:hover .increment-arrow,
+   .modal-spinner .decrement-arrow-button:hover .decrement-arrow {
+       -fx-background-color: white;
+   }
+
+   /* ══════════════════════════════════════════
+      LISTA DE PROVEEDORES (modal productos)
+      ══════════════════════════════════════════ */
+   .provider-list {
+       -fx-background-color: #FFFFFF;
+       -fx-background-radius: 8;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+   }
+   .provider-list .list-cell {
+       -fx-background-color: transparent;
+       -fx-padding: 4 10 4 10;
+   }
+   .provider-list .list-cell:odd {
+       -fx-background-color: #F9F7FF;
+   }
+   .provider-list .list-cell:selected {
+       -fx-background-color: #EDE9FA;
+   }
+   .provider-list .list-cell:hover {
+       -fx-background-color: #EDE9FA;
+   }
+   .provider-list .check-box {
+       -fx-text-fill: #242038;
+       -fx-font-size: 12px;
+       -fx-font-family: "Segoe UI", sans-serif;
+   }
+   .provider-list .check-box .box {
+       -fx-background-color: #F5F3FA;
+       -fx-border-color: #725AC1;
+       -fx-border-radius: 3;
+       -fx-border-width: 1.5;
+   }
+   .provider-list .check-box:selected .box {
+       -fx-background-color: #725AC1;
+   }
+   .provider-list .check-box:selected .mark {
+       -fx-background-color: white;
+   }
+   /* ══════════════════════════════════════════
+      MODAL SCROLL
+      ══════════════════════════════════════════ */
+   .modal-scroll {
+       -fx-background-color: transparent;
+       -fx-border-color: transparent;
+   }
+   .modal-scroll > .viewport {
+       -fx-background-color: transparent;
+   }
+
+   /* ══════════════════════════════════════════
+      TABLA DE PERMISOS
+      ══════════════════════════════════════════ */
+   .form-section-label {
+       -fx-text-fill: #242038;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-size: 13px;
+       -fx-font-weight: bold;
+   }
+
+   .permisos-grid {
+       -fx-background-color: #FFFFFF;
+       -fx-background-radius: 10;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 10;
+       -fx-border-width: 1.5;
+       -fx-padding: 10 12 10 12;
+   }
+
+   .perm-header {
+       -fx-text-fill: #7A7486;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-size: 11px;
+       -fx-font-weight: bold;
+       -fx-alignment: CENTER;
+   }
+
+   .perm-module {
+       -fx-text-fill: #242038;
+       -fx-font-family: "Segoe UI", sans-serif;
+       -fx-font-size: 12px;
+       -fx-padding: 4 0 4 4;
+   }
+
+   /* ── Toggle buttons de permisos ── */
+   .perm-toggle {
+       -fx-background-color: #F5F3FA;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 6;
+       -fx-background-radius: 6;
+       -fx-border-width: 1.5;
+       -fx-min-width: 32;
+       -fx-min-height: 26;
+       -fx-max-width: 32;
+       -fx-max-height: 26;
+       -fx-text-fill: transparent;
+       -fx-cursor: hand;
+   }
+   .perm-toggle:hover {
+       -fx-background-color: #EDE9FA;
+       -fx-border-color: #725AC1;
+   }
+   .perm-toggle:selected {
+       -fx-background-color: #725AC1;
+       -fx-border-color: #725AC1;
+   }
+   .perm-toggle:selected:hover {
+       -fx-background-color: #8D86C9;
+   }
+   /* ══════════════════════════════════════════
+      VALIDACIÓN DE CAMPOS
+      ══════════════════════════════════════════ */
+   .field-error {
+       -fx-text-fill: #E05252;
+       -fx-font-size: 11px;
+       -fx-font-family: "Segoe UI", sans-serif;
+   }
+
+   .field-error-border {
+       -fx-border-color: #E05252 !important;
+       -fx-effect: dropshadow(gaussian, rgba(224,82,82,0.25), 8, 0, 0, 0);
+   }
+   /* ══════════════════════════════════════════
+      MODAL VENTAS
+      ══════════════════════════════════════════ */
+
+   /* Confirmación de selección */
+   .field-confirm {
+       -fx-text-fill: #725AC1;
+       -fx-font-size: 11px;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+   }
+
+   /* Separador */
+   .venta-separator {
+       -fx-background-color: #E2DEEE;
+       -fx-padding: 0;
+   }
+
+   /* Encabezados de columna tabla productos */
+   .productos-header {
+       -fx-background-color: #EDE9FA;
+       -fx-background-radius: 6;
+       -fx-padding: 6 10 6 10;
+   }
+
+   /* Fila de producto */
+   .producto-fila {
+       -fx-background-color: #FFFFFF;
+       -fx-background-radius: 8;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+   }
+   .producto-fila:hover {
+       -fx-border-color: #725AC1;
+       -fx-background-color: #FAFAFE;
+   }
+
+   /* Labels de precio y subtotal por fila */
+   .fila-precio {
+       -fx-text-fill: #7A7486;
+       -fx-font-size: 13px;
+       -fx-font-family: "Segoe UI", sans-serif;
+   }
+   .fila-subtotal {
+       -fx-text-fill: #242038;
+       -fx-font-size: 13px;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-weight: bold;
+   }
+
+   /* Botón eliminar fila */
+   .fila-btn-eliminar {
+       -fx-background-color: rgba(224,82,82,0.1);
+       -fx-text-fill: #E05252;
+       -fx-background-radius: 6;
+       -fx-border-color: rgba(224,82,82,0.3);
+       -fx-border-radius: 6;
+       -fx-border-width: 1.5;
+       -fx-cursor: hand;
+       -fx-font-size: 11px;
+   }
+   .fila-btn-eliminar:hover {
+       -fx-background-color: #E05252;
+       -fx-text-fill: white;
+       -fx-border-color: transparent;
+   }
+
+   /* Botón agregar fila */
+   .btn-agregar-fila {
+       -fx-background-color: rgba(114,90,193,0.1);
+       -fx-text-fill: #725AC1;
+       -fx-background-radius: 8;
+       -fx-border-color: rgba(114,90,193,0.4);
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+       -fx-font-size: 12px;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-padding: 7 16 7 16;
+       -fx-cursor: hand;
+   }
+   .btn-agregar-fila:hover {
+       -fx-background-color: rgba(114,90,193,0.2);
+       -fx-border-color: #725AC1;
+   }
+
+   /* Dropdown de búsqueda */
+   .search-dropdown {
+       -fx-background-color: #FFFFFF;
+       -fx-background-radius: 8;
+       -fx-border-color: #725AC1;
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+       -fx-effect: dropshadow(gaussian, rgba(114,90,193,0.25), 12, 0, 0, 4);
+       -fx-padding: 4 0 4 0;
+   }
+   .dropdown-item {
+       -fx-padding: 7 14 7 14;
+       -fx-font-size: 12px;
+       -fx-font-family: "Segoe UI", sans-serif;
+       -fx-text-fill: #242038;
+       -fx-background-color: transparent;
+       -fx-cursor: hand;
+   }
+   .dropdown-item:hover {
+       -fx-background-color: #EDE9FA;
+       -fx-text-fill: #725AC1;
+   }
+
+   /* Resumen de totales */
+   .resumen-box {
+       -fx-background-color: #F5F3FA;
+       -fx-background-radius: 10;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 10;
+       -fx-border-width: 1.5;
+   }
+   .resumen-label {
+       -fx-text-fill: #7A7486;
+       -fx-font-size: 13px;
+       -fx-font-family: "Segoe UI", sans-serif;
+       -fx-min-width: 80;
+   }
+   .resumen-valor {
+       -fx-text-fill: #242038;
+       -fx-font-size: 13px;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-min-width: 90;
+       -fx-alignment: CENTER_RIGHT;
+   }
+   .resumen-label-total {
+       -fx-text-fill: #242038;
+       -fx-font-size: 15px;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-weight: bold;
+       -fx-min-width: 80;
+   }
+   .resumen-valor-total {
+       -fx-text-fill: #725AC1;
+       -fx-font-size: 18px;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-weight: bold;
+       -fx-min-width: 90;
+       -fx-alignment: CENTER_RIGHT;
+   }

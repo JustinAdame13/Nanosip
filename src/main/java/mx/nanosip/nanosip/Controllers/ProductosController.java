@@ -38,7 +38,7 @@ public class ProductosController extends BaseController {
     //  Acciones propias
     // ─────────────────────────────────────────────────────────
     @FXML public void generarReporte()   { /* TODO */ }
-    @FXML public void crear()    { /* TODO */ }
-    @FXML public void editar()   { /* TODO */ }
+    @FXML public void crear()  { abrirModal("CrProductos.fxml"); }
+    @FXML public void editar() { abrirModal("CrProductos.fxml"); }
     @FXML public void eliminar() { /* TODO */ }
 }

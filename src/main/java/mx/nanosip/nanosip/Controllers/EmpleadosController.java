@@ -37,7 +37,7 @@ public class EmpleadosController extends BaseController {
     //  Acciones propias
     // ─────────────────────────────────────────────────────────
     @FXML public void generarReporte()   { /* TODO */ }
-    @FXML public void crear()    { /* TODO */ }
-    @FXML public void editar()   { /* TODO */ }
+    @FXML public void crear()  { abrirModal("CrEmpleados.fxml"); }
+    @FXML public void editar() { abrirModal("CrEmpleados.fxml"); }
     @FXML public void eliminar() { /* TODO */ }
 }
