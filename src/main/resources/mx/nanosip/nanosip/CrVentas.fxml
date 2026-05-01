@@ -100,16 +100,16 @@
                 <padding><Insets bottom="10" left="16" right="16" top="10"/></padding>
                 <HBox alignment="CENTER_RIGHT" spacing="16">
                     <Label text="Subtotal:" styleClass="resumen-label"/>
-                    <Label fx:id="lblSubtotal" text="$0.00" styleClass="resumen-valor"/>
+                    <Label fx:id="lblSubtotal" text="\$0.00" styleClass="resumen-valor"/>
                 </HBox>
                 <HBox alignment="CENTER_RIGHT" spacing="16">
                     <Label text="IVA (16%):" styleClass="resumen-label"/>
-                    <Label fx:id="lblIva" text="$0.00" styleClass="resumen-valor"/>
+                    <Label fx:id="lblIva" text="\$0.00" styleClass="resumen-valor"/>
                 </HBox>
                 <Separator styleClass="venta-separator"/>
                 <HBox alignment="CENTER_RIGHT" spacing="16">
                     <Label text="TOTAL:" styleClass="resumen-label-total"/>
-                    <Label fx:id="lblTotal" text="$0.00" styleClass="resumen-valor-total"/>
+                    <Label fx:id="lblTotal" text="\$0.00" styleClass="resumen-valor-total"/>
                 </HBox>
             </VBox>
 
