@@ -312,3 +312,12 @@
    -fx-effect: dropshadow(gaussian, rgba(36,32,56,0.5), 18, 0, 0, -4);
    -fx-background-radius: 0 0 12 12;
    }
+   /* ══════════════════════════════════════════
+      FORM LABELS (modales)
+      ══════════════════════════════════════════ */
+   .form-label {
+       -fx-text-fill: #7A7486;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-size: 11px;
+       -fx-font-weight: bold;
+   }
