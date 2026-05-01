@@ -1,14 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="660.0" prefWidth="640.0"
+            stylesheets="@Styles.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.nanosip.nanosip.Controllers.Modals.CrVentasController"
+            styleClass="root-pane">
 
-</AnchorPane>
+    <!-- TOP BAR -->
+    <top>
+        <HBox fx:id="topbar" alignment="CENTER_LEFT" prefHeight="46.0" spacing="8" styleClass="topbar">
+            <padding><Insets bottom="8" left="16" right="8" top="8"/></padding>
+            <Label fx:id="lblTitulo" styleClass="topbar-title" text="Nueva Venta"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─"/>
+            <Button onAction="#cerrarModal" styleClass="wmbtn, wmbtn-close" text="✕"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="14" styleClass="login-card">
+            <padding><Insets bottom="24" left="32" right="32" top="20"/></padding>
+
+            <!-- ── Encabezado de la venta ── -->
+            <HBox spacing="12">
+                <!-- Número de venta -->
+                <VBox spacing="4" prefWidth="140">
+                    <Label styleClass="form-label" text="N° de Venta"/>
+                    <TextField fx:id="txtNumVenta" promptText="Automático"
+                               styleClass="login-field" editable="false" opacity="0.6"/>
+                </VBox>
+
+                <!-- ID Empleado -->
+                <VBox spacing="4" prefWidth="140">
+                    <Label styleClass="form-label" text="ID Empleado"/>
+                    <TextField fx:id="txtIdEmpleado" promptText="Sesión actual"
+                               styleClass="login-field" editable="false" opacity="0.6"/>
+                </VBox>
+
+                <!-- Cliente -->
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Cliente"/>
+                    <StackPane alignment="TOP_LEFT">
+                        <TextField fx:id="txtBuscarCliente"
+                                   promptText="🔍  Buscar cliente…"
+                                   styleClass="login-field"/>
+                        <!-- Dropdown de clientes -->
+                        <VBox fx:id="dropdownClientes" styleClass="search-dropdown"
+                              visible="false" managed="false"
+                              translateY="36"/>
+                    </StackPane>
+                    <Label fx:id="lblClienteSeleccionado" styleClass="field-confirm"
+                           text="" visible="false" managed="false"/>
+                </VBox>
+            </HBox>
+
+            <Separator styleClass="venta-separator"/>
+
+            <!-- ── Encabezados de la tabla de productos ── -->
+            <HBox spacing="8" styleClass="productos-header">
+                <padding><Insets left="4" right="4"/></padding>
+                <Label text="Producto" prefWidth="220" styleClass="perm-header"/>
+                <Label text="Cant." prefWidth="70"  styleClass="perm-header"/>
+                <Label text="Precio unit." prefWidth="100" styleClass="perm-header"/>
+                <Label text="Subtotal" prefWidth="100" styleClass="perm-header"/>
+                <Label text="" prefWidth="32"/> <!-- espacio botón eliminar -->
+            </HBox>
+
+            <!-- ── Filas de productos (ScrollPane) ── -->
+            <ScrollPane fx:id="scrollProductos" fitToWidth="true"
+                        prefHeight="240" hbarPolicy="NEVER"
+                        styleClass="modal-scroll">
+                <VBox fx:id="contenedorFilas" spacing="8">
+                    <padding><Insets bottom="4" right="4" top="4"/></padding>
+                </VBox>
+            </ScrollPane>
+
+            <!-- Botón agregar producto -->
+            <Button fx:id="btnAgregarProducto" onAction="#agregarFila"
+                    text="＋ Agregar producto"
+                    styleClass="btn-agregar-fila"/>
+
+            <Separator styleClass="venta-separator"/>
+
+            <!-- ── Resumen ── -->
+            <VBox spacing="6" styleClass="resumen-box" alignment="CENTER_RIGHT">
+                <padding><Insets bottom="10" left="16" right="16" top="10"/></padding>
+                <HBox alignment="CENTER_RIGHT" spacing="16">
+                    <Label text="Subtotal:" styleClass="resumen-label"/>
+                    <Label fx:id="lblSubtotal" text="$0.00" styleClass="resumen-valor"/>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" spacing="16">
+                    <Label text="IVA (16%):" styleClass="resumen-label"/>
+                    <Label fx:id="lblIva" text="$0.00" styleClass="resumen-valor"/>
+                </HBox>
+                <Separator styleClass="venta-separator"/>
+                <HBox alignment="CENTER_RIGHT" spacing="16">
+                    <Label text="TOTAL:" styleClass="resumen-label-total"/>
+                    <Label fx:id="lblTotal" text="$0.00" styleClass="resumen-valor-total"/>
+                </HBox>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS" minHeight="4"/>
+
+            <!-- Botón guardar -->
+            <Button fx:id="btnGuardar" onAction="#guardar"
+                    text="Registrar Venta" styleClass="login-btn"
+                    maxWidth="Infinity"/>
+        </VBox>
+    </center>
+
+</BorderPane>

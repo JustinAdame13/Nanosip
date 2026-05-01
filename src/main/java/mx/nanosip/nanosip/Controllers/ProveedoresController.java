@@ -35,7 +35,7 @@ public class ProveedoresController extends BaseController {
     //  Acciones propias
     // ─────────────────────────────────────────────────────────
     @FXML public void generarReporte()   { /* TODO */ }
-    @FXML public void crear()    { /* TODO */ }
-    @FXML public void editar()   { /* TODO */ }
+    @FXML public void crear()  { abrirModal("CrProveedores.fxml"); }
+    @FXML public void editar() { abrirModal("CrProveedores.fxml"); }
     @FXML public void eliminar() { /* TODO */ }
 }

@@ -4,12 +4,20 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import mx.nanosip.nanosip.App;
+import mx.nanosip.nanosip.Controllers.Modals.ModalController;
 import mx.nanosip.nanosip.WindowDragUtil;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
@@ -97,4 +105,41 @@ public abstract class BaseController {
             e.printStackTrace();
         }
     }
+    protected void abrirModal(String fxml) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource(fxml));
+            Parent root = loader.load();
+
+            Stage modal = new Stage();
+            modal.initModality(Modality.WINDOW_MODAL);
+            modal.initOwner(App.getStage());
+            modal.initStyle(StageStyle.TRANSPARENT);
+            modal.setResizable(false);
+
+            Scene scene = new Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            modal.setScene(scene);
+
+            // Inyectar Stage al controller del modal
+            Object ctrl = loader.getController();
+            if (ctrl instanceof ModalController mc) {
+                mc.setModalStage(modal);
+            }
+
+            // Habilitar arrastre usando el topbar del modal
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) {
+                WindowDragUtil.enable(topbarNode, modal);
+            }
+
+            modal.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 }

@@ -1,14 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="620.0" prefWidth="400.0"
+            stylesheets="@Styles.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.nanosip.nanosip.Controllers.Modals.CrProductosController"
+            styleClass="root-pane">
 
-</AnchorPane>
+    <!-- TOP BAR -->
+    <top>
+        <HBox fx:id="topbar" alignment="CENTER_LEFT" prefHeight="46.0" spacing="8" styleClass="topbar">
+            <padding><Insets bottom="8" left="16" right="8" top="8"/></padding>
+            <Label fx:id="lblTitulo" styleClass="topbar-title" text="Nuevo Producto"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─"/>
+            <Button onAction="#cerrarModal" styleClass="wmbtn, wmbtn-close" text="✕"/>
+        </HBox>
+    </top>
+
+    <!-- FORMULARIO -->
+    <center>
+        <VBox alignment="TOP_LEFT" spacing="12" styleClass="login-card">
+            <padding><Insets bottom="28" left="32" right="32" top="20"/></padding>
+
+            <!-- Clave (solo lectura) -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Clave"/>
+                <TextField fx:id="txtClave" promptText="Asignada automáticamente"
+                           styleClass="login-field" editable="false" opacity="0.6"/>
+            </VBox>
+
+            <!-- Nombre -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Nombre"/>
+                <TextField fx:id="txtNombre" promptText="Nombre del producto"
+                           styleClass="login-field"/>
+            </VBox>
+
+            <!-- Descripción -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Descripción"/>
+                <TextField fx:id="txtDescripcion" promptText="Descripción"
+                           styleClass="login-field"/>
+            </VBox>
+
+            <!-- Marca y Existencia en la misma fila -->
+            <HBox spacing="12">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Marca"/>
+                    <TextField fx:id="txtMarca" promptText="Marca"
+                               styleClass="login-field"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label styleClass="form-label" text="Existencia"/>
+                    <Spinner fx:id="spnExistencia" min="0" max="999999"
+                             initialValue="0" editable="true"
+                             prefWidth="110" styleClass="modal-spinner"/>
+                </VBox>
+            </HBox>
+
+            <!-- Precio y Costo en la misma fila -->
+            <HBox spacing="12">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Precio"/>
+                    <TextField fx:id="txtPrecio" promptText="0.00"
+                               styleClass="login-field"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Costo"/>
+                    <TextField fx:id="txtCosto" promptText="0.00"
+                               styleClass="login-field"/>
+                </VBox>
+            </HBox>
+
+            <!-- Proveedores -->
+            <VBox spacing="6">
+                <Label styleClass="form-label" text="Proveedores"/>
+                <!-- Búsqueda -->
+                <TextField fx:id="txtBuscarProveedor"
+                           promptText="🔍  Buscar proveedor…"
+                           styleClass="login-field"/>
+                <!-- Lista con checkboxes -->
+                <ListView fx:id="listaProveedores"
+                          prefHeight="110"
+                          styleClass="provider-list"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Botón guardar -->
+            <Button fx:id="btnGuardar" onAction="#guardar"
+                    text="Guardar" styleClass="login-btn"
+                    maxWidth="Infinity"/>
+        </VBox>
+    </center>
+
+</BorderPane>
