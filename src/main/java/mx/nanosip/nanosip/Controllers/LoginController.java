@@ -8,7 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import mx.nanosip.nanosip.App;
 import mx.nanosip.nanosip.WindowDragUtil;
-
+import java.sql.Connection;
 import java.io.IOException;
 
 
@@ -32,6 +32,14 @@ public class LoginController {
     public void Ingresar(){
 
 
+        try (Connection conn = ConexionBD.getConexion()) {
+            System.out.println("Conectado 🚀");
+
+            // aquí puedes hacer queries después
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         //cambio de ventana
