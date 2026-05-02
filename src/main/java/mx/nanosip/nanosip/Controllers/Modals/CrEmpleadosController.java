@@ -229,6 +229,8 @@ public class CrEmpleadosController implements ModalController {
     public void setEmpleado(Empleados e) {
         if (e == null) return;
 
+        this.empleadoEditando = e;
+
         txtId.setText(String.valueOf(e.getId()));
         txtNombre.setText(e.getNombre());
         txtPuesto.setText(e.getPuesto());

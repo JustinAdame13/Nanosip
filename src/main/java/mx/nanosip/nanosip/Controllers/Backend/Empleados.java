@@ -3,7 +3,8 @@ package mx.nanosip.nanosip.Controllers.Backend;
 
 public class Empleados {
 
-    private transient Integer id;
+
+    private Integer id;
     private String nombre;
     private String puesto;
     private String rfc;
@@ -29,7 +30,7 @@ public class Empleados {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
