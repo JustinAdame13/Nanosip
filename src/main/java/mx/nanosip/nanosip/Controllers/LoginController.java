@@ -32,14 +32,6 @@ public class LoginController {
     public void Ingresar(){
 
 
-        try (Connection conn = ConexionBD.getConexion()) {
-            System.out.println("Conectado 🚀");
-
-            // aquí puedes hacer queries después
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
         //cambio de ventana

@@ -3,6 +3,8 @@ module mx.nanosip.nanosip {
     requires javafx.fxml;
     requires java.sql;
     requires com.microsoft.sqlserver.jdbc;
+    requires com.google.gson;
+    requires java.net.http;
 
     opens mx.nanosip.nanosip to javafx.fxml;
     exports mx.nanosip.nanosip;
@@ -10,6 +12,6 @@ module mx.nanosip.nanosip {
     opens mx.nanosip.nanosip.Controllers to javafx.fxml;
     exports mx.nanosip.nanosip.Controllers.Modals;
     opens mx.nanosip.nanosip.Controllers.Modals to javafx.fxml;
-    opens mx.nanosip.nanosip.Controllers.Backend to javafx.base, javafx.controls;
+    opens mx.nanosip.nanosip.Controllers.Backend to javafx.base, javafx.controls, com.google.gson;
 
 }

@@ -1,15 +1,9 @@
 package mx.nanosip.nanosip.Controllers.Backend;
-import mx.nanosip.nanosip.Controllers.ConexionBD;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 
 public class Empleados {
 
-    private int id;
+    private transient Integer id;
     private String nombre;
     private String puesto;
     private String rfc;
@@ -18,16 +12,20 @@ public class Empleados {
     private String contrasena;
     private String permisos;
 
-    public Empleados(int id, String nombre, String puesto, byte edad, String rfc, String curp) {
-        this.id     = id;
+    public Empleados() {
+    }
+
+    public Empleados(String nombre, String puesto, byte edad, String rfc, String curp, String contrasena, String permisos) {
         this.nombre = nombre;
         this.puesto = puesto;
         this.edad   = edad;
         this.rfc    = rfc;
         this.curp   = curp;
+        this.contrasena=contrasena;
+        this.permisos=permisos;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

@@ -1,13 +1,10 @@
 package mx.nanosip.nanosip.Controllers.Modals;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
+import mx.nanosip.nanosip.Controllers.Backend.Empleados;
+import mx.nanosip.nanosip.Controllers.Backend.EmpleadosAPI;
 
 public class CrEmpleadosController implements ModalController {
 
@@ -54,7 +51,8 @@ public class CrEmpleadosController implements ModalController {
     @FXML private ToggleButton tPrvEliminar;
 
     private Stage modalStage;
-
+    private Empleados empleadoEditando = null;
+    private final EmpleadosAPI api = new EmpleadosAPI();
     // ─────────────────────────────────────────────────────────
     //  Inicialización
     // ─────────────────────────────────────────────────────────
@@ -153,8 +151,63 @@ public class CrEmpleadosController implements ModalController {
             txtPasswordConfirm.getStyleClass().add("field-error-border");
             return;
         }
-        // TODO: validar resto de campos y llamar al servicio/API
-        System.out.println("Permisos: " + getPermisos());
+
+        if (txtNombre.getText().isBlank() || txtRFC.getText().isBlank()) {
+            mostrarAlerta("Llena todos los campos obligatorios.");
+            return;
+        }
+
+        try {
+            if (empleadoEditando == null) {
+                // ── CREAR ──────────────────────────────────────
+                if (txtPassword.getText().isBlank()) {
+                    mostrarAlerta("La contraseña es obligatoria.");
+                    return;
+                }
+                if (!txtPassword.getText().equals(txtPasswordConfirm.getText())) {
+                    mostrarAlerta("Las contraseñas no coinciden.");
+                    return;
+                }
+                Empleados nuevo = new Empleados(
+                        txtNombre.getText().trim(),
+                        txtPuesto.getText().trim(),
+                        spnEdad.getValue().byteValue(),
+                        txtRFC.getText().trim().toUpperCase(),
+                        txtCURP.getText().trim().toUpperCase(),
+                        txtPassword.getText().trim(),
+                        getPermisos()
+                );
+                nuevo.setContrasena(txtPassword.getText());
+                api.guardar(nuevo);
+
+            } else {
+                // ── EDITAR ──────────────────────────────────────
+                empleadoEditando.setNombre(txtNombre.getText().trim());
+                empleadoEditando.setPuesto(txtPuesto.getText().trim());
+                empleadoEditando.setRfc(txtRFC.getText().trim().toUpperCase());
+                empleadoEditando.setCurp(txtCURP.getText().trim().toUpperCase());
+                empleadoEditando.setEdad(spnEdad.getValue().byteValue());
+                empleadoEditando.setPermisos(getPermisos());
+
+                if (!txtPassword.getText().isBlank()) {
+                    if (!txtPassword.getText().equals(txtPasswordConfirm.getText())) {
+                        mostrarAlerta("Las contraseñas no coinciden.");
+                        return;
+                    }
+                    empleadoEditando.setContrasena(txtPassword.getText());
+                }
+                api.actualizar(empleadoEditando);
+            }
+
+            ((Stage) txtNombre.getScene().getWindow()).close();
+
+        } catch (Exception e) {
+            mostrarAlerta("Error: " + e.getMessage());
+        }
+    
+
+        
+
         cerrarModal();
     }
 
@@ -172,4 +225,58 @@ public class CrEmpleadosController implements ModalController {
     public void setModalStage(Stage stage) {
         this.modalStage = stage;
     }
+
+    public void setEmpleado(Empleados e) {
+        if (e == null) return;
+
+        txtId.setText(String.valueOf(e.getId()));
+        txtNombre.setText(e.getNombre());
+        txtPuesto.setText(e.getPuesto());
+        txtRFC.setText(e.getRfc());
+        txtCURP.setText(e.getCurp());
+
+        spnEdad.getValueFactory().setValue((int) e.getEdad());
+
+        txtPassword.setText(e.getContrasena());
+        txtPasswordConfirm.setText(e.getContrasena());
+
+        cargarPermisosNumericos(e.getPermisos());
+    }
+
+    private void cargarPermisosNumericos(String permisos) {
+
+        if (permisos == null || permisos.length() < 5) return;
+
+        int emp = Character.getNumericValue(permisos.charAt(0));
+        int ven = Character.getNumericValue(permisos.charAt(1));
+        int cli = Character.getNumericValue(permisos.charAt(2));
+        int pro = Character.getNumericValue(permisos.charAt(3));
+        int prv = Character.getNumericValue(permisos.charAt(4));
+
+        aplicarPermisos(emp, tEmpVer, tEmpCrear, tEmpEditar, tEmpEliminar);
+        aplicarPermisos(ven, tVenVer, tVenCrear, tVenEditar, tVenEliminar);
+        aplicarPermisos(cli, tCliVer, tCliCrear, tCliEditar, tCliEliminar);
+        aplicarPermisos(pro, tProVer, tProCrear, tProEditar, tProEliminar);
+        aplicarPermisos(prv, tPrvVer, tPrvCrear, tPrvEditar, tPrvEliminar);
+    }
+
+    private void aplicarPermisos(int nivel,
+                                 ToggleButton ver,
+                                 ToggleButton crear,
+                                 ToggleButton editar,
+                                 ToggleButton eliminar) {
+
+        ver.setSelected(nivel >= 1);
+        crear.setSelected(nivel >= 2);
+        editar.setSelected(nivel >= 3);
+        eliminar.setSelected(nivel >= 4);
+    }
+
+    private void mostrarAlerta(String msg) {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setHeaderText(null);
+        a.setContentText(msg);
+        a.showAndWait();
+    }
+
 }

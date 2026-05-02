@@ -5,27 +5,23 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import mx.nanosip.nanosip.Controllers.Backend.Empleados;
-import mx.nanosip.nanosip.Controllers.Backend.EmpleadosDAO;
+import mx.nanosip.nanosip.Controllers.Backend.EmpleadosAPI;
+import mx.nanosip.nanosip.Controllers.Modals.CrEmpleadosController;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.IOException;
+import java.util.List;
 
 public class EmpleadosController extends BaseController {
 
-    // ── Top bar ──────────────────────────────────────────────
-    @FXML private Button btnReporte;
-    @FXML private Button btnCrear;
-    @FXML private Button btnEditar;
-    @FXML private Button btnEliminar;
-
-    // ── Contenido ────────────────────────────────────────────
-    @FXML private TextField           txtBusqueda;
+    @FXML private TextField            txtBusqueda;
     @FXML private TableView<Empleados> tablaEmpleados;
-
-    // ── Columnas ─────────────────────────────────────────────
     @FXML private TableColumn<Empleados, Integer> colId;
     @FXML private TableColumn<Empleados, String>  colNombre;
     @FXML private TableColumn<Empleados, String>  colPuesto;
@@ -33,10 +29,9 @@ public class EmpleadosController extends BaseController {
     @FXML private TableColumn<Empleados, String>  colRFC;
     @FXML private TableColumn<Empleados, String>  curp;
 
-    // ── Lista maestra ─────────────────────────────────────────
     private final ObservableList<Empleados> listaCompleta = FXCollections.observableArrayList();
+    private final EmpleadosAPI api = new EmpleadosAPI();
 
-    // ─────────────────────────────────────────────────────────
     @FXML
     public void initialize() {
         initBase();
@@ -45,7 +40,6 @@ public class EmpleadosController extends BaseController {
         configurarBuscador();
     }
 
-    // ─────────────────────────────────────────────────────────
     private void configurarTabla() {
         colId    .setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -57,18 +51,10 @@ public class EmpleadosController extends BaseController {
 
     private void cargarDatos() {
         listaCompleta.clear();
-        try (ResultSet rs = new EmpleadosDAO().obtenerTodos()) {
-            while (rs.next()) {
-                listaCompleta.add(new Empleados(
-                        rs.getInt   ("ID"),
-                        rs.getString("Nombre"),
-                        rs.getString("Puesto"),
-                        rs.getByte   ("Edad"),
-                        rs.getString("RFC"),
-                        rs.getString("CURP")
-                ));
-            }
-        } catch (SQLException e) {
+        try {
+            List<Empleados> lista = api.obtenerTodos();
+            listaCompleta.addAll(lista);
+        } catch (Exception e) {
             System.err.println("Error cargando empleados: " + e.getMessage());
         }
     }
@@ -93,12 +79,38 @@ public class EmpleadosController extends BaseController {
         tablaEmpleados.setItems(listaOrdenada);
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  Acciones
-    // ─────────────────────────────────────────────────────────
-    @FXML public void generarReporte() { /* TODO */ }
-    @FXML public void crear()          { abrirModal("CrEmpleados.fxml"); }
-    @FXML public void editar()         { abrirModal("CrEmpleados.fxml"); }
+    @FXML public void crear() {
+        abrirModal("CrEmpleados.fxml");
+        cargarDatos();
+    }
+
+    @FXML public void generarReporte() {
+    }
+
+    @FXML public void editar() {
+        Empleados seleccionado = tablaEmpleados.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Selecciona un empleado primero.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/CrEmpleados.fxml"));
+            Parent root = loader.load();
+
+            CrEmpleadosController modal = loader.getController();
+            modal.setEmpleado(seleccionado);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            cargarDatos(); // refresca después de cerrar
+
+        } catch (IOException e) {
+            System.err.println("Error abriendo modal: " + e.getMessage());
+        }
+    }
 
     @FXML public void eliminar() {
         Empleados seleccionado = tablaEmpleados.getSelectionModel().getSelectedItem();
@@ -107,19 +119,22 @@ public class EmpleadosController extends BaseController {
             return;
         }
 
-        // Confirmación antes de borrar
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "¿Eliminar a " + seleccionado.getNombre() + "?",
                 ButtonType.YES, ButtonType.NO);
+
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
-                new EmpleadosDAO().eliminar(seleccionado);
-                cargarDatos(); // refresca la tabla
+                try {
+                    api.eliminar(seleccionado.getId());
+                    cargarDatos();
+                } catch (Exception e) {
+                    mostrarAlerta("Error al eliminar: " + e.getMessage());
+                }
             }
         });
     }
 
-    // ─────────────────────────────────────────────────────────
     private void mostrarAlerta(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setHeaderText(null);
