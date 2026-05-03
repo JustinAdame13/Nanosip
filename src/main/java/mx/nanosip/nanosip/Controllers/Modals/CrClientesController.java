@@ -1,9 +1,10 @@
 package mx.nanosip.nanosip.Controllers.Modals;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
+import mx.nanosip.nanosip.Controllers.Backend.Clientes;
+import mx.nanosip.nanosip.Controllers.Backend.ClientesAPI;
 
 public class CrClientesController implements ModalController {
 
@@ -13,23 +14,55 @@ public class CrClientesController implements ModalController {
     @FXML private TextField txtRFC;
     @FXML private TextField txtTelefono;
 
-    private Stage modalStage;
+    private Stage    modalStage;
+    private Clientes clienteEditar = null;
+    private final ClientesAPI api  = new ClientesAPI();
 
     @Override
-    public void setModalStage(Stage stage) {
-        this.modalStage = stage;
+    public void setModalStage(Stage stage) { this.modalStage = stage; }
+
+    public void setCliente(Clientes c) {
+        this.clienteEditar = c;
+        lblTitulo .setText("Editar Cliente");
+        txtId     .setText(String.valueOf(c.getId()));
+        txtId     .setDisable(true);
+        txtNombre .setText(c.getNombre());
+        txtRFC    .setText(c.getRfc());
+        txtTelefono.setText(c.getTelefono());
     }
 
     @FXML
     public void guardar() {
-        // TODO: validar y llamar al servicio/API
-        cerrarModal();
+        if (!validar()) return;
+        try {
+            if (clienteEditar == null) {
+                api.guardar(new Clientes(
+                        txtNombre.getText().trim(),
+                        txtRFC.getText().trim(),
+                        txtTelefono.getText().trim()));
+            } else {
+                clienteEditar.setNombre  (txtNombre.getText().trim());
+                clienteEditar.setRfc     (txtRFC.getText().trim());
+                clienteEditar.setTelefono(txtTelefono.getText().trim());
+                api.actualizar(clienteEditar);
+            }
+            cerrarModal();
+        } catch (Exception e) {
+            alerta("Error al guardar: " + e.getMessage());
+        }
     }
 
-    @FXML
-    public void cerrarModal() {
-        if (modalStage != null) modalStage.close();
+    private boolean validar() {
+        if (txtNombre.getText().isBlank())   { alerta("El nombre es obligatorio.");   return false; }
+        if (txtRFC.getText().isBlank())      { alerta("El RFC es obligatorio.");      return false; }
+        if (txtTelefono.getText().isBlank()) { alerta("El teléfono es obligatorio."); return false; }
+        return true;
     }
 
+    private void alerta(String msg) {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
+    }
 
+    @FXML public void cerrarModal() { if (modalStage != null) modalStage.close(); }
 }

@@ -13,6 +13,7 @@ public class ClientesAPI {
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
 
+    // ── GET todos ────────────────────────────────────────────
     public List<Clientes> obtenerTodos() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE))
@@ -23,8 +24,10 @@ public class ClientesAPI {
         return gson.fromJson(res.body(), new TypeToken<List<Clientes>>(){}.getType());
     }
 
-    public void guardar(Clientes c) throws Exception {
-        String json = gson.toJson(c);
+    // ── POST crear ───────────────────────────────────────────
+    public void guardar(Clientes cli) throws Exception {
+        String json = gson.toJson(cli);
+        System.out.println("JSON enviado: " + json);
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE))
@@ -32,13 +35,22 @@ public class ClientesAPI {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
-        client.send(req, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + res.statusCode());
+        System.out.println("Response: " + res.body());
+
+        if (res.statusCode() != 200 && res.statusCode() != 201) {
+            throw new RuntimeException("Error al guardar: " + res.body());
+        }
     }
 
-    public void actualizar(Clientes c) throws Exception {
-        String json = gson.toJson(c);
+    // ── PUT editar ───────────────────────────────────────────
+    public void actualizar(Clientes cli) throws Exception {
+        String json = gson.toJson(cli);
+
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE + "/" + c.getId()))
+                .uri(URI.create(BASE + "/" + cli.getId()))
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.ofString(json))
                 .build();
@@ -46,6 +58,7 @@ public class ClientesAPI {
         client.send(req, HttpResponse.BodyHandlers.ofString());
     }
 
+    // ── DELETE eliminar ──────────────────────────────────────
     public void eliminar(int id) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/" + id))

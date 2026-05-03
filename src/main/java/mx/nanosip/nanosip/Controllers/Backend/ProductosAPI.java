@@ -1,4 +1,70 @@
 package mx.nanosip.nanosip.Controllers.Backend;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
+import java.net.URI;
+import java.net.http.*;
+import java.util.List;
+
 public class ProductosAPI {
+
+    private static final String BASE = "http://localhost:8080/api/productos";
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final Gson gson = new Gson();
+
+    // ── GET todos ────────────────────────────────────────────
+    public List<Productos> obtenerTodos() throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE))
+                .GET()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+        return gson.fromJson(res.body(), new TypeToken<List<Productos>>(){}.getType());
+    }
+
+    // ── POST crear ───────────────────────────────────────────
+    public void guardar(Productos prod) throws Exception {
+        String json = gson.toJson(prod);
+        System.out.println("JSON enviado: " + json);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Status: " + res.statusCode());
+        System.out.println("Response: " + res.body());
+
+        if (res.statusCode() != 200 && res.statusCode() != 201) {
+            throw new RuntimeException("Error al guardar: " + res.body());
+        }
+    }
+
+    // ── PUT editar ───────────────────────────────────────────
+    public void actualizar(Productos prod) throws Exception {
+        String json = gson.toJson(prod);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/" + prod.getClave()))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    // ── DELETE eliminar ──────────────────────────────────────
+    public void eliminar(int clave) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/" + clave))
+                .DELETE()
+                .build();
+
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
 }

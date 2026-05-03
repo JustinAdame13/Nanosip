@@ -1,168 +1,239 @@
 package mx.nanosip.nanosip.Controllers.Modals;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import mx.nanosip.nanosip.Controllers.Backend.*;
 
-import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CrVentasController implements ModalController {
 
-    // ── FXML ──────────────────────────────────────────────────
+    @FXML private Label     lblTitulo;
     @FXML private TextField txtNumVenta;
     @FXML private TextField txtIdEmpleado;
     @FXML private TextField txtBuscarCliente;
     @FXML private VBox      dropdownClientes;
     @FXML private Label     lblClienteSeleccionado;
     @FXML private VBox      contenedorFilas;
-    @FXML private ScrollPane scrollProductos;
     @FXML private Label     lblSubtotal;
     @FXML private Label     lblIva;
     @FXML private Label     lblTotal;
 
-    private Stage modalStage;
+    private Stage    modalStage;
+    private Ventas   ventaEditar          = null;
+    private Clientes clienteSeleccionado  = null;
+
+    private final VentasAPI    apiVentas    = new VentasAPI();
+    private final ClientesAPI  apiClientes  = new ClientesAPI();
+    private final ProductosAPI apiProductos = new ProductosAPI();
+
+    private List<Clientes>  todosClientes  = new ArrayList<>();
+    private List<Productos> todosProductos = new ArrayList<>();
+
+    // Cada fila dinámica de la tabla de productos
     private final List<FilaProducto> filas = new ArrayList<>();
 
-    // ── Datos mock (reemplazar con API/BD) ────────────────────
-    // Formato: {clave, nombre, precio}
-    private final List<String[]> productosMock = List.of(
-            new String[]{"P001", "Silla Ejecutiva",   "1500.00"},
-            new String[]{"P002", "Escritorio Roble",  "3200.00"},
-            new String[]{"P003", "Monitor 24\"",      "4500.00"},
-            new String[]{"P004", "Teclado Mecánico",  "850.00"},
-            new String[]{"P005", "Mouse Inalámbrico", "350.00"}
-    );
+    // ─────────────────────────────────────────────────────────
+    //  Inner class: fila de producto
+    // ─────────────────────────────────────────────────────────
+    private class FilaProducto {
+        final HBox              hbox;
+        final ComboBox<Productos> cmbProducto;
+        final TextField           txtCantidad;
+        final Label               lblPrecioUnit;
+        final Label               lblSubtotalFila;
 
-    private final List<String> clientesMock = List.of(
-            "García López, Juan",
-            "Martínez Ruiz, Ana",
-            "Distribuidora Norte S.A.",
-            "Comercial Del Valle",
-            "Hernández Pérez, Luis"
-    );
+        FilaProducto(List<Productos> productos) {
+            // ── Producto ──────────────────────────────────────
+            cmbProducto = new ComboBox<>();
+            cmbProducto.getItems().addAll(productos);
+            cmbProducto.setPromptText("Seleccionar producto…");
+            cmbProducto.setPrefWidth(220);
+            cmbProducto.setConverter(new javafx.util.StringConverter<>() {
+                public String toString(Productos p)   { return p == null ? "" : p.getNombre(); }
+                public Productos fromString(String s) { return null; }
+            });
 
-    private String clienteSeleccionado = null;
+            // ── Cantidad ──────────────────────────────────────
+            txtCantidad = new TextField("1");
+            txtCantidad.setPrefWidth(70);
+            txtCantidad.setAlignment(Pos.CENTER);
 
-    private static final NumberFormat CURRENCY =
-            NumberFormat.getCurrencyInstance(new Locale("es", "MX"));
+            // ── Precio unitario ───────────────────────────────
+            lblPrecioUnit = new Label("$0.00");
+            lblPrecioUnit.setPrefWidth(100);
+            lblPrecioUnit.setAlignment(Pos.CENTER_RIGHT);
+
+            // ── Subtotal fila ─────────────────────────────────
+            lblSubtotalFila = new Label("$0.00");
+            lblSubtotalFila.setPrefWidth(100);
+            lblSubtotalFila.setAlignment(Pos.CENTER_RIGHT);
+
+            // ── Botón eliminar ────────────────────────────────
+            Button btnEliminar = new Button("✕");
+            btnEliminar.setPrefWidth(32);
+            btnEliminar.getStyleClass().add("wmbtn-close");
+            btnEliminar.setOnAction(e -> eliminarFila(this));
+
+            // ── Listeners para recalcular ─────────────────────
+            cmbProducto.valueProperty().addListener((obs, ant, nuevo) -> {
+                if (nuevo != null) {
+                    lblPrecioUnit.setText(String.format("$%.2f", nuevo.getPrecio()));
+                } else {
+                    lblPrecioUnit.setText("$0.00");
+                }
+                actualizarSubtotalFila(this);
+                recalcularTotales();
+            });
+
+            txtCantidad.textProperty().addListener((obs, ant, nuevo) -> {
+                actualizarSubtotalFila(this);
+                recalcularTotales();
+            });
+
+            // ── Ensamble del HBox ─────────────────────────────
+            hbox = new HBox(8, cmbProducto, txtCantidad, lblPrecioUnit, lblSubtotalFila, btnEliminar);
+            hbox.setAlignment(Pos.CENTER_LEFT);
+            hbox.setPadding(new Insets(2, 4, 2, 4));
+            HBox.setHgrow(cmbProducto, Priority.NEVER);
+        }
+
+        double getSubtotal() {
+            Productos p = cmbProducto.getValue();
+            if (p == null) return 0;
+            try {
+                int cant = Integer.parseInt(txtCantidad.getText().trim());
+                return p.getPrecio() * cant;
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+    }
 
     // ─────────────────────────────────────────────────────────
     //  Inicialización
     // ─────────────────────────────────────────────────────────
     @FXML
     public void initialize() {
-        // Búsqueda de cliente con dropdown
-        txtBuscarCliente.textProperty().addListener((obs, anterior, nuevo) -> {
-            if (clienteSeleccionado != null) {
-                clienteSeleccionado = null;
-                lblClienteSeleccionado.setVisible(false);
-                lblClienteSeleccionado.setManaged(false);
+        cargarClientes();
+        cargarProductos();
+        configurarBuscadorCliente();
+        agregarFila(); // Una fila vacía de inicio
+    }
+
+    private void cargarClientes() {
+        try {
+            todosClientes = apiClientes.obtenerTodos();
+        } catch (Exception e) {
+            System.err.println("Error cargando clientes: " + e.getMessage());
+        }
+    }
+
+    private void cargarProductos() {
+        try {
+            todosProductos = apiProductos.obtenerTodos();
+        } catch (Exception e) {
+            System.err.println("Error cargando productos: " + e.getMessage());
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  Buscador de clientes con dropdown
+    // ─────────────────────────────────────────────────────────
+    private void configurarBuscadorCliente() {
+        txtBuscarCliente.textProperty().addListener((obs, ant, nuevo) -> {
+            if (nuevo == null || nuevo.isBlank()) {
+                dropdownClientes.setVisible(false);
+                dropdownClientes.setManaged(false);
+                return;
             }
-            filtrarClientes(nuevo);
-        });
+            String f = nuevo.toLowerCase().trim();
+            List<Clientes> filtrados = todosClientes.stream()
+                    .filter(c -> c.getNombre().toLowerCase().contains(f)
+                            || c.getRfc().toLowerCase().contains(f)
+                            || c.getTelefono().contains(f))
+                    .toList();
 
-        // Ocultar dropdown si pierde foco
-        txtBuscarCliente.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
-            if (!isFocused) ocultarDropdownClientes();
-        });
+            dropdownClientes.getChildren().clear();
+            for (Clientes c : filtrados) {
+                Label opcion = new Label(c.getNombre() + "  |  " + c.getRfc());
+                opcion.setMaxWidth(Double.MAX_VALUE);
+                opcion.setPadding(new Insets(6, 12, 6, 12));
+                opcion.getStyleClass().add("dropdown-item");
+                opcion.setOnMouseClicked(e -> seleccionarCliente(c));
+                dropdownClientes.getChildren().add(opcion);
+            }
 
-        // Primera fila al abrir
-        agregarFila();
+            boolean hay = !filtrados.isEmpty();
+            dropdownClientes.setVisible(hay);
+            dropdownClientes.setManaged(hay);
+        });
     }
 
-    // ─────────────────────────────────────────────────────────
-    //  Dropdown de clientes
-    // ─────────────────────────────────────────────────────────
-    private void filtrarClientes(String filtro) {
-        dropdownClientes.getChildren().clear();
-
-        if (filtro == null || filtro.isBlank()) {
-            ocultarDropdownClientes();
-            return;
-        }
-
-        String lower = filtro.toLowerCase();
-        List<String> resultados = clientesMock.stream()
-                .filter(c -> c.toLowerCase().contains(lower))
-                .toList();
-
-        if (resultados.isEmpty()) {
-            ocultarDropdownClientes();
-            return;
-        }
-
-        for (String cliente : resultados) {
-            Label item = new Label(cliente);
-            item.getStyleClass().add("dropdown-item");
-            item.setMaxWidth(Double.MAX_VALUE);
-            item.setOnMousePressed(e -> seleccionarCliente(cliente));
-            dropdownClientes.getChildren().add(item);
-        }
-
-        dropdownClientes.setVisible(true);
-        dropdownClientes.setManaged(true);
-    }
-
-    private void seleccionarCliente(String cliente) {
-        clienteSeleccionado = cliente;
-        txtBuscarCliente.setText(cliente);
-        ocultarDropdownClientes();
-        lblClienteSeleccionado.setText("✔  " + cliente);
+    private void seleccionarCliente(Clientes c) {
+        clienteSeleccionado = c;
+        txtBuscarCliente.setText(c.getNombre());
+        dropdownClientes.setVisible(false);
+        dropdownClientes.setManaged(false);
+        lblClienteSeleccionado.setText("✓ " + c.getNombre() + "  —  RFC: " + c.getRfc());
         lblClienteSeleccionado.setVisible(true);
         lblClienteSeleccionado.setManaged(true);
     }
 
-    private void ocultarDropdownClientes() {
-        dropdownClientes.setVisible(false);
-        dropdownClientes.setManaged(false);
-        dropdownClientes.getChildren().clear();
-    }
-
     // ─────────────────────────────────────────────────────────
-    //  Filas de productos
+    //  Agregar / eliminar filas
     // ─────────────────────────────────────────────────────────
     @FXML
     public void agregarFila() {
-        FilaProducto fila = new FilaProducto();
+        FilaProducto fila = new FilaProducto(todosProductos);
         filas.add(fila);
-        contenedorFilas.getChildren().add(fila.getRoot());
-
-        // Hacer scroll al fondo al agregar nueva fila
-        scrollProductos.layout();
-        scrollProductos.setVvalue(1.0);
+        contenedorFilas.getChildren().add(fila.hbox);
+        recalcularTotales();
     }
 
     private void eliminarFila(FilaProducto fila) {
         filas.remove(fila);
-        contenedorFilas.getChildren().remove(fila.getRoot());
-        recalcularTotal();
+        contenedorFilas.getChildren().remove(fila.hbox);
+        recalcularTotales();
     }
 
     // ─────────────────────────────────────────────────────────
-    //  Cálculo del total
+    //  Cálculos
     // ─────────────────────────────────────────────────────────
-    void recalcularTotal() {
-        double subtotal = filas.stream()
-                .mapToDouble(FilaProducto::getSubtotal)
-                .sum();
-        double iva   = subtotal * 0.16;
-        double total = subtotal + iva;
+    private void actualizarSubtotalFila(FilaProducto fila) {
+        fila.lblSubtotalFila.setText(String.format("$%.2f", fila.getSubtotal()));
+    }
 
-        lblSubtotal.setText(CURRENCY.format(subtotal));
-        lblIva.setText(CURRENCY.format(iva));
-        lblTotal.setText(CURRENCY.format(total));
+    private void recalcularTotales() {
+        double subtotal = filas.stream().mapToDouble(FilaProducto::getSubtotal).sum();
+        double iva      = subtotal * 0.16;
+        double total    = subtotal + iva;
+        lblSubtotal.setText(String.format("$%.2f", subtotal));
+        lblIva     .setText(String.format("$%.2f", iva));
+        lblTotal   .setText(String.format("$%.2f", total));
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  Modo edición
+    // ─────────────────────────────────────────────────────────
+    public void setVenta(Ventas v) {
+        this.ventaEditar = v;
+        txtNumVenta.setText(String.valueOf(v.getNumero()));
+        txtIdEmpleado.setText(String.valueOf(v.getIdEmpleado()));
+
+        // Preseleccionar cliente
+        todosClientes.stream()
+                .filter(c -> c.getId().equals(v.getIdClientes()))
+                .findFirst()
+                .ifPresent(this::seleccionarCliente);
     }
 
     // ─────────────────────────────────────────────────────────
@@ -170,190 +241,67 @@ public class CrVentasController implements ModalController {
     // ─────────────────────────────────────────────────────────
     @FXML
     public void guardar() {
-        // TODO: validar campos y llamar al servicio/API
-        cerrarModal();
+        if (!validar()) return;
+
+        try {
+            double total = filas.stream().mapToDouble(FilaProducto::getSubtotal).sum() * 1.16;
+            int idEmpleado = txtIdEmpleado.getText().isBlank() ? 1
+                    : Integer.parseInt(txtIdEmpleado.getText().trim());
+
+            if (ventaEditar == null) {
+                Ventas nueva = new Ventas(idEmpleado, clienteSeleccionado.getId(), total);
+                nueva.setFecha(LocalDateTime.now());
+                apiVentas.guardar(nueva);
+            } else {
+                ventaEditar.setIdClientes(clienteSeleccionado.getId());
+                ventaEditar.setMonto(total);
+                apiVentas.actualizar(ventaEditar);
+            }
+            cerrarModal();
+        } catch (Exception e) {
+            mostrarError("Error al registrar venta: " + e.getMessage());
+        }
     }
 
-    @FXML
-    public void cerrarModal() {
-        if (modalStage != null) modalStage.close();
+    // ─────────────────────────────────────────────────────────
+    //  Validación
+    // ─────────────────────────────────────────────────────────
+    private boolean validar() {
+        if (clienteSeleccionado == null) {
+            mostrarError("Selecciona un cliente.");
+            return false;
+        }
+        if (filas.isEmpty()) {
+            mostrarError("Agrega al menos un producto.");
+            return false;
+        }
+        boolean algunoSinProducto = filas.stream()
+                .anyMatch(f -> f.cmbProducto.getValue() == null);
+        if (algunoSinProducto) {
+            mostrarError("Selecciona el producto en todas las filas.");
+            return false;
+        }
+        boolean cantidadInvalida = filas.stream().anyMatch(f -> {
+            try { return Integer.parseInt(f.txtCantidad.getText().trim()) <= 0; }
+            catch (NumberFormatException e) { return true; }
+        });
+        if (cantidadInvalida) {
+            mostrarError("Las cantidades deben ser números mayores a 0.");
+            return false;
+        }
+        return true;
     }
 
-    @FXML
-    public void minimizar() {
-        if (modalStage != null) modalStage.setIconified(true);
+    private void mostrarError(String msg) {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setHeaderText(null);
+        a.setContentText(msg);
+        a.showAndWait();
     }
+
+    @FXML public void cerrarModal() { if (modalStage != null) modalStage.close(); }
+    @FXML public void minimizar()   { if (modalStage != null) modalStage.setIconified(true); }
 
     @Override
-    public void setModalStage(Stage stage) {
-        this.modalStage = stage;
-    }
-
-    // ═════════════════════════════════════════════════════════
-    //  Clase interna — representa una fila de producto
-    // ═════════════════════════════════════════════════════════
-    private class FilaProducto {
-
-        private final StackPane root;
-        private final VBox      contenido;
-        private final TextField txtBuscar;
-        private final VBox      dropdown;
-        private final Label     lblConfirmacion;
-        private final TextField txtCantidad;
-        private final Label     lblPrecio;
-        private final Label     lblSubtotalFila;
-        private final Button    btnEliminar;
-
-        private String   claveSeleccionada = null;
-        private double   precioUnitario    = 0.0;
-
-        FilaProducto() {
-            // ── Campo búsqueda + dropdown ──────────────────────
-            txtBuscar = new TextField();
-            txtBuscar.setPromptText("🔍  Clave o nombre…");
-            txtBuscar.getStyleClass().add("login-field");
-            txtBuscar.setPrefWidth(220);
-
-            dropdown = new VBox();
-            dropdown.getStyleClass().add("search-dropdown");
-            dropdown.setVisible(false);
-            dropdown.setManaged(false);
-            dropdown.setTranslateY(36);
-
-            StackPane stackBuscar = new StackPane(txtBuscar, dropdown);
-            stackBuscar.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-            stackBuscar.setPrefWidth(220);
-
-            lblConfirmacion = new Label();
-            lblConfirmacion.getStyleClass().add("field-confirm");
-            lblConfirmacion.setVisible(false);
-            lblConfirmacion.setManaged(false);
-
-            VBox colProducto = new VBox(4, stackBuscar, lblConfirmacion);
-            colProducto.setPrefWidth(220);
-
-            // ── Cantidad ───────────────────────────────────────
-            txtCantidad = new TextField("1");
-            txtCantidad.getStyleClass().add("login-field");
-            txtCantidad.setPrefWidth(70);
-            txtCantidad.setAlignment(Pos.CENTER);
-
-            // ── Precio unitario (solo lectura) ─────────────────
-            lblPrecio = new Label("$0.00");
-            lblPrecio.getStyleClass().add("fila-precio");
-            lblPrecio.setPrefWidth(100);
-            lblPrecio.setAlignment(Pos.CENTER_RIGHT);
-
-            // ── Subtotal fila ──────────────────────────────────
-            lblSubtotalFila = new Label("$0.00");
-            lblSubtotalFila.getStyleClass().add("fila-subtotal");
-            lblSubtotalFila.setPrefWidth(100);
-            lblSubtotalFila.setAlignment(Pos.CENTER_RIGHT);
-
-            // ── Botón eliminar ─────────────────────────────────
-            btnEliminar = new Button("✕");
-            btnEliminar.getStyleClass().add("fila-btn-eliminar");
-            btnEliminar.setPrefWidth(32);
-            btnEliminar.setPrefHeight(32);
-            btnEliminar.setOnAction(e -> eliminarFila(this));
-
-            // ── HBox de la fila ────────────────────────────────
-            HBox fila = new HBox(8, colProducto, txtCantidad,
-                    lblPrecio, lblSubtotalFila, btnEliminar);
-            fila.setAlignment(Pos.CENTER_LEFT);
-            fila.getStyleClass().add("producto-fila");
-            fila.setPadding(new javafx.geometry.Insets(6, 6, 6, 6));
-
-            contenido = new VBox(fila);
-            root = new StackPane(contenido);
-
-            // ── Listeners ──────────────────────────────────────
-            txtBuscar.textProperty().addListener((obs, ant, nuevo) -> {
-                claveSeleccionada = null;
-                lblConfirmacion.setVisible(false);
-                lblConfirmacion.setManaged(false);
-                filtrarProductos(nuevo);
-            });
-
-            txtBuscar.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
-                if (!isFocused) ocultarDropdown();
-            });
-
-            txtCantidad.textProperty().addListener((obs, ant, nuevo) ->
-                    actualizarSubtotalFila());
-        }
-
-        // ── Filtrado de productos ──────────────────────────────
-        private void filtrarProductos(String filtro) {
-            dropdown.getChildren().clear();
-
-            if (filtro == null || filtro.isBlank()) {
-                ocultarDropdown();
-                return;
-            }
-
-            String lower = filtro.toLowerCase();
-            List<String[]> resultados = productosMock.stream()
-                    .filter(p -> p[0].toLowerCase().contains(lower)
-                            || p[1].toLowerCase().contains(lower))
-                    .toList();
-
-            if (resultados.isEmpty()) {
-                ocultarDropdown();
-                return;
-            }
-
-            for (String[] prod : resultados) {
-                // prod: [clave, nombre, precio]
-                Label item = new Label(prod[0] + " — " + prod[1]
-                        + "  (" + CURRENCY.format(Double.parseDouble(prod[2])) + ")");
-                item.getStyleClass().add("dropdown-item");
-                item.setMaxWidth(Double.MAX_VALUE);
-                item.setOnMousePressed(e -> seleccionarProducto(prod));
-                dropdown.getChildren().add(item);
-            }
-
-            dropdown.setVisible(true);
-            dropdown.setManaged(true);
-        }
-
-        private void seleccionarProducto(String[] prod) {
-            claveSeleccionada = prod[0];
-            precioUnitario    = Double.parseDouble(prod[2]);
-
-            txtBuscar.setText(prod[0] + " — " + prod[1]);
-            ocultarDropdown();
-
-            lblConfirmacion.setText("✔  " + prod[1]);
-            lblConfirmacion.setVisible(true);
-            lblConfirmacion.setManaged(true);
-
-            lblPrecio.setText(CURRENCY.format(precioUnitario));
-            actualizarSubtotalFila();
-        }
-
-        private void ocultarDropdown() {
-            dropdown.setVisible(false);
-            dropdown.setManaged(false);
-            dropdown.getChildren().clear();
-        }
-
-        // ── Cálculo del subtotal de esta fila ──────────────────
-        private void actualizarSubtotalFila() {
-            double subtotal = getSubtotal();
-            lblSubtotalFila.setText(CURRENCY.format(subtotal));
-            recalcularTotal();
-        }
-
-        double getSubtotal() {
-            try {
-                int cantidad = Integer.parseInt(txtCantidad.getText().trim());
-                return cantidad > 0 ? precioUnitario * cantidad : 0.0;
-            } catch (NumberFormatException e) {
-                return 0.0;
-            }
-        }
-
-        StackPane getRoot() { return root; }
-    }
+    public void setModalStage(Stage stage) { this.modalStage = stage; }
 }
