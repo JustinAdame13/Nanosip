@@ -10,7 +10,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import mx.nanosip.nanosip.Controllers.Backend.Empleados;
 import mx.nanosip.nanosip.Controllers.Backend.EmpleadosAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrEmpleadosController;
@@ -103,10 +105,16 @@ public class EmpleadosController extends BaseController {
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
+
+
+
             stage.showAndWait();
 
             cargarDatos(); // refresca después de cerrar
 
+
+
+            modal.cerrarModal();
         } catch (IOException e) {
             System.err.println("Error abriendo modal: " + e.getMessage());
         }
