@@ -37,7 +37,6 @@ public class ClientesAPI {
 
     public void actualizar(Clientes c) throws Exception {
         String json = gson.toJson(c);
-
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/" + c.getId()))
                 .header("Content-Type", "application/json")
