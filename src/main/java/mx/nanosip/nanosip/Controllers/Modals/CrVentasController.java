@@ -237,7 +237,7 @@ public class CrVentasController implements ModalController {
     }
 
     // ─────────────────────────────────────────────────────────
-    //  Guardar
+    //  Guardar asdasdasdasdasdasd
     // ─────────────────────────────────────────────────────────
     @FXML
     public void guardar() {
