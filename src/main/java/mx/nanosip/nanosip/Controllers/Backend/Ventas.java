@@ -7,7 +7,9 @@ public class Ventas {
     private Integer idEmpleado;
     private Integer idClientes;
     private LocalDateTime fecha;
+    private String productos;
     private double monto;
+    private int cantidadTotal;
 
     public Ventas() {}
 
@@ -56,4 +58,21 @@ public class Ventas {
     public void setMonto(double monto) {
         this.monto = monto;
     }
+
+    public Integer getCantidadTotal() {
+        return cantidadTotal;
+    }
+
+    public void setCantidadTotal(Integer cantidadTotal) {
+        this.cantidadTotal = cantidadTotal;
+    }
+
+    public String getProductos() {
+        return productos;
+    }
+
+    public void setProductos(String productos) {
+        this.productos = productos;
+    }
 }
+

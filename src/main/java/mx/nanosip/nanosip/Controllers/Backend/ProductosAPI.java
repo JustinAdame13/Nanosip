@@ -2,9 +2,10 @@ package mx.nanosip.nanosip.Controllers.Backend;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-
+import java.util.stream.Collectors;
 import java.net.URI;
 import java.net.http.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductosAPI {
@@ -14,18 +15,9 @@ public class ProductosAPI {
     private static final Gson gson = new Gson();
 
     // ── GET todos ────────────────────────────────────────────
-    public List<Productos> obtenerTodos() throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE))
-                .GET()
-                .build();
-
-        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
-        return gson.fromJson(res.body(), new TypeToken<List<Productos>>(){}.getType());
-    }
 
     // ── POST crear ───────────────────────────────────────────
-    public void guardar(Productos prod) throws Exception {
+    public Productos guardar(Productos prod) throws Exception {
         String json = gson.toJson(prod);
         System.out.println("JSON enviado: " + json);
 
@@ -43,6 +35,7 @@ public class ProductosAPI {
         if (res.statusCode() != 200 && res.statusCode() != 201) {
             throw new RuntimeException("Error al guardar: " + res.body());
         }
+        return prod;
     }
 
     // ── PUT editar ───────────────────────────────────────────
@@ -66,5 +59,68 @@ public class ProductosAPI {
                 .build();
 
         client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static List<Productos> obtenerTodos() throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/productos"))
+                .GET()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200) {
+            throw new RuntimeException("Error al obtener catálogo de productos: " + res.body());
+        }
+
+        return gson.fromJson(res.body(), new TypeToken<List<Productos>>(){}.getType());
+    }
+
+    public void guardarProveedorProducto(int claveProducto, int idProveedor) throws Exception {
+        String json = String.format("{\"claveProducto\":%d, \"idProveedor\":%d}", claveProducto, idProveedor);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/productos-proveedores"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public void eliminarProveedoresDeProducto(int claveProducto) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/productos-proveedores/" + claveProducto))
+                .DELETE()
+                .build();
+
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public List<Integer> obtenerIdsProveedoresPorProducto(int claveProducto) throws Exception {
+        // CAMBIO: Quitar el "?claveProducto=" y usar "/" para que coincida con @PathVariable
+        String url = "http://localhost:8080/api/productos-proveedores/producto/" + claveProducto;
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200) {
+            System.err.println("Error en la API: " + res.statusCode());
+            return new ArrayList<>();
+        }
+
+        List <ProductosProveedores> relaciones = gson.fromJson(
+                res.body(),
+                new TypeToken<List<ProductosProveedores>>() {}.getType()
+        );
+
+        return relaciones.stream()
+                .map(ProductosProveedores::getIdProveedor)
+                .toList();
     }
 }

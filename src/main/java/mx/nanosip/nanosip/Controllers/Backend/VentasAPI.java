@@ -32,9 +32,8 @@ public class VentasAPI {
     }
 
     // ── POST crear ───────────────────────────────────────────
-    public void guardar(Ventas venta) throws Exception {
+    public Ventas guardar(Ventas venta) throws Exception {
         String json = gson.toJson(venta);
-        System.out.println("JSON enviado: " + json);
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE))
@@ -44,13 +43,13 @@ public class VentasAPI {
 
         HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("Status: " + res.statusCode());
-        System.out.println("Response: " + res.body());
-
         if (res.statusCode() != 200 && res.statusCode() != 201) {
             throw new RuntimeException("Error al guardar: " + res.body());
         }
+
+        return gson.fromJson(res.body(), Ventas.class);
     }
+
 
     // ── PUT editar ───────────────────────────────────────────
     public void actualizar(Ventas venta) throws Exception {
@@ -73,5 +72,42 @@ public class VentasAPI {
                 .build();
 
         client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+
+    // 2. Guardar un detalle de producto
+    public void guardarDetalle(VentasProductos detalle) throws Exception {
+        String json = gson.toJson(detalle);
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/ventas-productos")) // Tu endpoint de la tabla intermedia
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public void eliminarDetalles(int numeroVenta) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
+                .DELETE()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200 && res.statusCode() != 204) {
+            throw new RuntimeException("Error al limpiar productos anteriores: " + res.body());
+        }
+    }
+
+    public List<VentasProductos> obtenerDetalles(int numeroVenta) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
+                .GET()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        return gson.fromJson(res.body(),
+                new TypeToken<List<VentasProductos>>(){}.getType());
     }
 }

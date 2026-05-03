@@ -11,9 +11,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import mx.nanosip.nanosip.Controllers.Backend.Ventas;
-import mx.nanosip.nanosip.Controllers.Backend.VentasAPI;
+import mx.nanosip.nanosip.Controllers.Backend.*;
 import mx.nanosip.nanosip.Controllers.Modals.CrVentasController;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -45,16 +45,52 @@ public class VentasController extends BaseController {
         colEmpleado.setCellValueFactory(new PropertyValueFactory<>("idEmpleado"));
         colCliente .setCellValueFactory(new PropertyValueFactory<>("idClientes"));
         colMonto   .setCellValueFactory(new PropertyValueFactory<>("monto"));
-        // colProducto y colCantidad se mapean cuando el backend los soporte
+
+        // Estas son las que procesaremos manualmente abajo
+        colProducto.setCellValueFactory(new PropertyValueFactory<>("productos"));
+        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidadTotal"));
     }
 
     private void cargarDatos() {
         listaCompleta.clear();
         try {
-            List<Ventas> lista = api.obtenerTodos();
-            listaCompleta.addAll(lista);
+            // 1. Traemos las ventas base y el catálogo de nombres de productos
+            List<Ventas> ventasBase = api.obtenerTodos();
+            List<Productos> catalogo = ProductosAPI.obtenerTodos();
+
+            for (Ventas v : ventasBase) {
+                // 2. Por cada venta, consultamos sus productos (ventas-productos)
+                List<VentasProductos> detalles = api.obtenerDetalles(v.getNumero());
+
+                StringBuilder nombresResumen = new StringBuilder();
+                int sumaUnidades = 0;
+
+                for (VentasProductos det : detalles) {
+                    // Sumamos la cantidad de unidades
+                    sumaUnidades += det.getCantidad();
+
+                    // Buscamos el nombre del producto por su ID
+                    String nombre = catalogo.stream()
+                            .filter(p -> p.getClave().equals(det.getClaveProducto()))
+                            .map(Productos::getNombre)
+                            .findFirst()
+                            .orElse("ID: " + det.getClaveProducto());
+
+                    nombresResumen.append(nombre).append(", ");
+                }
+
+                // 3. Limpiamos la coma final y asignamos al objeto de la tabla
+                if (nombresResumen.length() > 0) {
+                    nombresResumen.setLength(nombresResumen.length() - 2);
+                }
+
+                v.setProductos(nombresResumen.toString());
+                v.setCantidadTotal(sumaUnidades); // Aquí se guarda el total de unidades (ej: 6)
+            }
+
+            listaCompleta.addAll(ventasBase);
         } catch (Exception e) {
-            System.err.println("Error cargando ventas: " + e.getMessage());
+            System.err.println("Error al procesar la tabla de ventas: " + e.getMessage());
         }
     }
 
@@ -135,4 +171,6 @@ public class VentasController extends BaseController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+
+
 }
