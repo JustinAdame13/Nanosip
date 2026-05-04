@@ -13,7 +13,6 @@ import mx.nanosip.nanosip.Controllers.Backend.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CrVentasController implements ModalController {
 
@@ -124,6 +123,12 @@ public class CrVentasController implements ModalController {
     // ─────────────────────────────────────────────────────────
     @FXML
     public void initialize() {
+        if (txtIdEmpleado != null) {
+            txtIdEmpleado.setEditable(false);
+
+            // Opcional: Si además quieres que se vea "gris" para que sea obvio que está bloqueado:
+            txtIdEmpleado.setDisable(true);
+        }
         cargarClientes();
         cargarProductos();
         configurarBuscadorCliente();
@@ -227,53 +232,14 @@ public class CrVentasController implements ModalController {
     // ─────────────────────────────────────────────────────────
     public void setVenta(Ventas v) {
         this.ventaEditar = v;
-
-        // 1. Cargar textos principales
-        lblTitulo.setText("Editar Venta #" + v.getNumero());
         txtNumVenta.setText(String.valueOf(v.getNumero()));
         txtIdEmpleado.setText(String.valueOf(v.getIdEmpleado()));
 
-        // 2. Buscar y seleccionar el cliente de esta venta
-        Clientes clienteVenta = todosClientes.stream()
+        // Preseleccionar cliente
+        todosClientes.stream()
                 .filter(c -> c.getId().equals(v.getIdClientes()))
                 .findFirst()
-                .orElse(null);
-
-        if (clienteVenta != null) {
-            seleccionarCliente(clienteVenta);
-        }
-
-        // 3. Cargar las filas de productos
-        try {
-            List<VentasProductos> detalles = apiVentas.obtenerDetalles(v.getNumero());
-
-            contenedorFilas.getChildren().clear();
-            filas.clear();
-
-            for (VentasProductos d : detalles) {
-                FilaProducto fila = new FilaProducto(todosProductos);
-
-                // Buscar producto real en la lista precargada
-                Productos prod = todosProductos.stream()
-                        .filter(p -> p.getClave().equals(d.getClaveProducto()))
-                        .findFirst()
-                        .orElse(null);
-
-                if (prod != null) {
-                    fila.cmbProducto.setValue(prod);
-                    fila.txtCantidad.setText(String.valueOf(d.getCantidad()));
-                    actualizarSubtotalFila(fila);
-                }
-
-                filas.add(fila);
-                contenedorFilas.getChildren().add(fila.hbox);
-            }
-
-            recalcularTotales();
-
-        } catch (Exception e) {
-            System.err.println("Error cargando detalles: " + e.getMessage());
-        }
+                .ifPresent(this::seleccionarCliente);
     }
 
     // ─────────────────────────────────────────────────────────
@@ -284,73 +250,46 @@ public class CrVentasController implements ModalController {
         if (!validar()) return;
 
         try {
-            double total = filas.stream()
-                    .mapToDouble(FilaProducto::getSubtotal)
-                    .sum() * 1.16;
+            // 1. Calculamos el total automático sumando los productos (con IVA del 16%)
+            double totalCalculado = filas.stream().mapToDouble(FilaProducto::getSubtotal).sum() * 1.16;
 
-            int idEmpleado = txtIdEmpleado.getText().isBlank() ? 1
-                    : Integer.parseInt(txtIdEmpleado.getText().trim());
+            // 2. Sacamos el ID del empleado desde la Bóveda Global (Sesión)
+            int idVendedor = mx.nanosip.nanosip.Controllers.Backend.Sesion.getInstance().getUsuarioActual().getId();
 
+            // 3. Obtenemos el ID del cliente
+            Integer idCliente = clienteSeleccionado.getId();
+
+            // 💡 USAMOS TU VARIABLE: ventaEditar
             if (ventaEditar == null) {
-                // ── CREAR NUEVA (Ya lo solucionamos usando el ID retornado) ──
-                Ventas nueva = new Ventas(idEmpleado, clienteSeleccionado.getId(), total);
-                nueva.setFecha(LocalDateTime.now());
+                // ── CREAR NUEVA VENTA ──
+                Ventas nueva = new Ventas();
 
-                // Aquí debes usar la lógica donde el servidor te devuelve la venta generada
-                Ventas ventaGuardada = apiVentas.guardar(nueva);
-                int idVenta = ventaGuardada.getNumero();
+                nueva.setIdEmpleado(idVendedor); // ¡ID Automático!
+                nueva.setIdClientes(idCliente);
+                nueva.setMonto(totalCalculado);  // ¡Total Automático!
 
-                for (FilaProducto f : filas) {
-                    VentasProductos det = new VentasProductos(
-                            idVenta,
-                            f.cmbProducto.getValue().getClave(),
-                            Integer.parseInt(f.txtCantidad.getText())
-                    );
-                    apiVentas.guardarDetalle(det);
-                }
+                // 💡 USAMOS TU API Y MÉTODO: apiVentas.guardar()
+                apiVentas.guardar(nueva);
 
             } else {
-                // ── EDITAR EXISTENTE ──
-                ventaEditar.setIdClientes(clienteSeleccionado.getId());
-                ventaEditar.setMonto(total);
-                ventaEditar.setIdEmpleado(idEmpleado);
+                // ── EDITAR VENTA EXISTENTE ──
+                ventaEditar.setIdClientes(idCliente);
+                ventaEditar.setMonto(totalCalculado);
+                // OJO: Por seguridad, no actualizamos el IdEmpleado al editar,
+                // porque la venta original la hizo quien la hizo.
 
-                // Llamamos a tu método que borra y recrea los detalles
-                actualizarVentaExistente(ventaEditar.getNumero());
+                // 💡 USAMOS TU API Y MÉTODO: apiVentas.actualizar()
+                apiVentas.actualizar(ventaEditar);
             }
 
             cerrarModal();
 
         } catch (Exception e) {
+            // 💡 USAMOS TU MÉTODO DE ALERTA: mostrarError()
             mostrarError("Error al registrar venta: " + e.getMessage());
         }
     }
 
-    private void actualizarVentaExistente(int idVenta) throws Exception {
-        // 1. Preparamos el String resumen para la tabla visual (opcional)
-        String nombresResumen = filas.stream()
-                .map(f -> f.cmbProducto.getValue().getNombre())
-                .collect(Collectors.joining(", "));
-
-        // 2. Actualizamos el objeto ventaEditar con los datos actuales de la UI
-        ventaEditar.setProductos(nombresResumen);
-        // El monto y el cliente ya se setearon en el método guardar() antes de llamar a este
-
-        // 3. Petición API: Actualizar cabecera de la venta
-        apiVentas.actualizar(ventaEditar);
-
-        // 4. Petición API: Borrar todos los productos viejos de esta venta en la tabla intermedia
-        apiVentas.eliminarDetalles(idVenta);
-
-        // 5. Bucle: Insertar los productos actuales como si fueran nuevos
-        for (FilaProducto fila : filas) {
-            Productos p = fila.cmbProducto.getValue();
-            int cantidad = Integer.parseInt(fila.txtCantidad.getText().trim());
-
-            VentasProductos detalle = new VentasProductos(idVenta, p.getClave(), cantidad);
-            apiVentas.guardarDetalle(detalle);
-        }
-    }
     // ─────────────────────────────────────────────────────────
     //  Validación
     // ─────────────────────────────────────────────────────────

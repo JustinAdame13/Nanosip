@@ -91,12 +91,16 @@ public abstract class BaseController {
     // ─────────────────────────────────────────────────────────
     //  Navegación
     // ─────────────────────────────────────────────────────────
-    @FXML public void irEmpleados()   { cambiarVista("Empleados.fxml"); }
-    @FXML public void irVentas()      { cambiarVista("Ventas.fxml"); }
-    @FXML public void irClientes()    { cambiarVista("Clientes.fxml"); }
-    @FXML public void irProductos()   { cambiarVista("Productos.fxml"); }
-    @FXML public void irProveedores() { cambiarVista("Proveedores.fxml"); }
-    @FXML public void cerrarSesion()  { cambiarVista("Login.fxml"); }
+    @FXML
+    public void irEmpleados() { cambiarPantalla("Empleados.fxml"); }
+    @FXML
+    public void irVentas()    { cambiarPantalla("Ventas.fxml"); }
+    @FXML
+    public void irClientes()  { cambiarPantalla("Clientes.fxml"); }
+    @FXML
+    public void irProductos() { cambiarPantalla("Productos.fxml"); }
+    @FXML
+    public void irProveedores() { cambiarPantalla("Proveedores.fxml"); }
 
     protected void cambiarVista(String fxml) {
         try {
@@ -139,7 +143,18 @@ public abstract class BaseController {
         }
     }
 
+    private void cambiarPantalla(String fxml) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/" + fxml));
+            javafx.scene.Parent root = loader.load();
 
+            // Usamos la variable topbar (que ya tienes en tus FXML) para cambiar la escena
+            topbar.getScene().setRoot(root);
+        } catch (Exception e) {
+            System.err.println("❌ Error al cambiar a: " + fxml);
+            e.printStackTrace();
+        }
+    }
 
 
 }

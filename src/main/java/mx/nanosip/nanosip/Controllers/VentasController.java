@@ -11,9 +11,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import mx.nanosip.nanosip.Controllers.Backend.*;
+import mx.nanosip.nanosip.Controllers.Backend.Ventas;
+import mx.nanosip.nanosip.Controllers.Backend.VentasAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrVentasController;
 
+// 💡 Importamos los modelos para poder leer la sesión global
+import mx.nanosip.nanosip.Controllers.Backend.Empleados;
+import mx.nanosip.nanosip.Controllers.Backend.Sesion;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,6 +33,16 @@ public class VentasController extends BaseController {
     @FXML private TableColumn<Ventas, ?>       colProducto;
     @FXML private TableColumn<Ventas, ?>       colCantidad;
 
+    // ── BOTONES PARA CONTROLAR PERMISOS ──
+    @FXML private Button btnNuevo;
+    @FXML private Button btnEditar;
+    @FXML private Button btnEliminar;
+
+    @FXML private Button dockEmpleados; // Solo si este botón existe en esta pantalla
+    @FXML private Button dockVentas;
+    @FXML private Button dockClientes;
+    @FXML private Button dockProductos;
+    @FXML private Button dockProveed;
     private final ObservableList<Ventas> listaCompleta = FXCollections.observableArrayList();
     private final VentasAPI api = new VentasAPI();
 
@@ -38,6 +52,54 @@ public class VentasController extends BaseController {
         configurarTabla();
         cargarDatos();
         configurarBuscador();
+
+        // 💡 ¡MAGIA AQUÍ! Aplicamos los permisos al abrir la pantalla de Ventas
+        configurarPermisos();
+        // ── LÓGICA DE PERMISOS PARA EL DOCK INFERIOR ──
+        mx.nanosip.nanosip.Controllers.Backend.Empleados usuario = mx.nanosip.nanosip.Controllers.Backend.Sesion.getInstance().getUsuarioActual();
+
+        if (usuario != null && usuario.getPermisos() != null) {
+            String p = usuario.getPermisos();
+
+            // Ocultamos/Mostramos los botones del dock inferior
+            aplicarVisibilidadMenu(dockEmpleados, p.charAt(0));
+            aplicarVisibilidadMenu(dockVentas,    p.charAt(1));
+            aplicarVisibilidadMenu(dockClientes,  p.charAt(2));
+            aplicarVisibilidadMenu(dockProductos, p.charAt(3));
+            aplicarVisibilidadMenu(dockProveed,   p.charAt(4));
+        }
+
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  Sistema de Permisos (Nivel 1: Ventas)
+    // ─────────────────────────────────────────────────────────
+    private void configurarPermisos() {
+        Empleados usuario = Sesion.getInstance().getUsuarioActual();
+
+        // Validamos que exista una sesión y que la cadena tenga al menos 5 dígitos
+        if (usuario != null && usuario.getPermisos() != null && usuario.getPermisos().length() >= 5) {
+            // Sacamos el nivel del módulo de Ventas (Posición 1 en la cadena)
+            int nivel = Character.getNumericValue(usuario.getPermisos().charAt(1));
+
+            // Nivel 1 = Solo ver (El menú se encarga de mostrar u ocultar la pantalla completa)
+            // Nivel 2 = Crear (>= 2)
+            // Nivel 3 = Editar (>= 3)
+            // Nivel 4 = Eliminar (>= 4)
+
+            if (btnNuevo != null) {
+                btnNuevo.setVisible(nivel >= 2);
+                btnNuevo.setManaged(nivel >= 2); // Oculta el espacio físico del botón si es false
+            }
+            if (btnEditar != null) {
+                btnEditar.setVisible(nivel >= 3);
+                btnEditar.setManaged(nivel >= 3);
+            }
+            if (btnEliminar != null) {
+                btnEliminar.setVisible(nivel >= 4);
+                btnEliminar.setManaged(nivel >= 4);
+            }
+        }
     }
 
     private void configurarTabla() {
@@ -45,52 +107,16 @@ public class VentasController extends BaseController {
         colEmpleado.setCellValueFactory(new PropertyValueFactory<>("idEmpleado"));
         colCliente .setCellValueFactory(new PropertyValueFactory<>("idClientes"));
         colMonto   .setCellValueFactory(new PropertyValueFactory<>("monto"));
-
-        // Estas son las que procesaremos manualmente abajo
-        colProducto.setCellValueFactory(new PropertyValueFactory<>("productos"));
-        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidadTotal"));
+        // colProducto y colCantidad se mapean cuando el backend los soporte
     }
 
     private void cargarDatos() {
         listaCompleta.clear();
         try {
-            // 1. Traemos las ventas base y el catálogo de nombres de productos
-            List<Ventas> ventasBase = api.obtenerTodos();
-            List<Productos> catalogo = ProductosAPI.obtenerTodos();
-
-            for (Ventas v : ventasBase) {
-                // 2. Por cada venta, consultamos sus productos (ventas-productos)
-                List<VentasProductos> detalles = api.obtenerDetalles(v.getNumero());
-
-                StringBuilder nombresResumen = new StringBuilder();
-                int sumaUnidades = 0;
-
-                for (VentasProductos det : detalles) {
-                    // Sumamos la cantidad de unidades
-                    sumaUnidades += det.getCantidad();
-
-                    // Buscamos el nombre del producto por su ID
-                    String nombre = catalogo.stream()
-                            .filter(p -> p.getClave().equals(det.getClaveProducto()))
-                            .map(Productos::getNombre)
-                            .findFirst()
-                            .orElse("ID: " + det.getClaveProducto());
-
-                    nombresResumen.append(nombre).append(", ");
-                }
-
-                // 3. Limpiamos la coma final y asignamos al objeto de la tabla
-                if (nombresResumen.length() > 0) {
-                    nombresResumen.setLength(nombresResumen.length() - 2);
-                }
-
-                v.setProductos(nombresResumen.toString());
-                v.setCantidadTotal(sumaUnidades); // Aquí se guarda el total de unidades (ej: 6)
-            }
-
-            listaCompleta.addAll(ventasBase);
+            List<Ventas> lista = api.obtenerTodos();
+            listaCompleta.addAll(lista);
         } catch (Exception e) {
-            System.err.println("Error al procesar la tabla de ventas: " + e.getMessage());
+            System.err.println("Error cargando ventas: " + e.getMessage());
         }
     }
 
@@ -171,6 +197,49 @@ public class VentasController extends BaseController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+    @FXML
+    public void cerrarSesion() {
+        try {
+            // 1. Cargamos el diseño del Login
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/Login.fxml"));
+            javafx.scene.Parent root = loader.load();
 
+            // 2. Creamos la ventanita nueva y sin bordes
+            javafx.stage.Stage loginStage = new javafx.stage.Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            loginStage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            loginStage.setScene(scene);
+            loginStage.centerOnScreen();
+            loginStage.show();
 
+            // 3. Cerramos la ventana actual gigante
+            // (Asegúrate de tener declarada la variable @FXML private HBox topbar; o usa cualquier otro ID que tengas en la pantalla)
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) topbar.getScene().getWindow();
+            currentStage.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    // Método universal para cambiar pantallas desde el dock inferior
+    private void cambiarPantalla(String fxml) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/" + fxml));
+            javafx.scene.Parent root = loader.load();
+
+            // Usamos la variable topbar (que ya tienes en tus FXML) para cambiar la escena
+            topbar.getScene().setRoot(root);
+        } catch (Exception e) {
+            System.err.println("❌ Error al cambiar a: " + fxml);
+            e.printStackTrace();
+        }
+    }
+    private void aplicarVisibilidadMenu(Button boton, char nivelPermiso) {
+        if (boton != null) {
+            boolean tieneAcceso = nivelPermiso != '0';
+            boton.setVisible(tieneAcceso);
+            boton.setManaged(tieneAcceso); // Esto hace que el espacio del botón desaparezca y los demás se recorran
+        }
+    }
 }

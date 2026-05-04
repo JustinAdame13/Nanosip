@@ -15,6 +15,10 @@ import mx.nanosip.nanosip.Controllers.Backend.Clientes;
 import mx.nanosip.nanosip.Controllers.Backend.ClientesAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrClientesController;
 
+// 💡 Importamos los modelos para la sesión global
+import mx.nanosip.nanosip.Controllers.Backend.Empleados;
+import mx.nanosip.nanosip.Controllers.Backend.Sesion;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -27,6 +31,16 @@ public class ClientesController extends BaseController {
     @FXML private TableColumn<Clientes, String>  colRFC;
     @FXML private TableColumn<Clientes, String>  colTelefono;
 
+    @FXML private Button dockEmpleados; // Solo si este botón existe en esta pantalla
+    @FXML private Button dockVentas;
+    @FXML private Button dockClientes;
+    @FXML private Button dockProductos;
+    @FXML private Button dockProveed;
+    // ── BOTONES PARA CONTROLAR PERMISOS ──
+    @FXML private Button btnNuevo;
+    @FXML private Button btnEditar;
+    @FXML private Button btnEliminar;
+
     private final ObservableList<Clientes> listaCompleta = FXCollections.observableArrayList();
     private final ClientesAPI api = new ClientesAPI();
 
@@ -36,6 +50,53 @@ public class ClientesController extends BaseController {
         configurarTabla();
         cargarDatos();
         configurarBuscador();
+
+        // 💡 ¡MAGIA AQUÍ! Aplicamos los permisos al abrir la pantalla de Clientes
+        configurarPermisos();
+        // ── LÓGICA DE PERMISOS PARA EL DOCK INFERIOR ──
+        mx.nanosip.nanosip.Controllers.Backend.Empleados usuario = mx.nanosip.nanosip.Controllers.Backend.Sesion.getInstance().getUsuarioActual();
+
+        if (usuario != null && usuario.getPermisos() != null) {
+            String p = usuario.getPermisos();
+
+            // Ocultamos/Mostramos los botones del dock inferior
+            aplicarVisibilidadMenu(dockEmpleados, p.charAt(0));
+            aplicarVisibilidadMenu(dockVentas,    p.charAt(1));
+            aplicarVisibilidadMenu(dockClientes,  p.charAt(2));
+            aplicarVisibilidadMenu(dockProductos, p.charAt(3));
+            aplicarVisibilidadMenu(dockProveed,   p.charAt(4));
+        }
+
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  Sistema de Permisos (Nivel 2: Clientes)
+    // ─────────────────────────────────────────────────────────
+    private void configurarPermisos() {
+        Empleados usuario = Sesion.getInstance().getUsuarioActual();
+
+        if (usuario != null && usuario.getPermisos() != null && usuario.getPermisos().length() >= 5) {
+            // Sacamos el nivel del módulo de Clientes (Posición 2)
+            int nivel = Character.getNumericValue(usuario.getPermisos().charAt(2));
+
+            // Nivel 1 = Solo ver
+            // Nivel 2 = Crear (>= 2)
+            // Nivel 3 = Editar (>= 3)
+            // Nivel 4 = Eliminar (>= 4)
+
+            if (btnNuevo != null) {
+                btnNuevo.setVisible(nivel >= 2);
+                btnNuevo.setManaged(nivel >= 2);
+            }
+            if (btnEditar != null) {
+                btnEditar.setVisible(nivel >= 3);
+                btnEditar.setManaged(nivel >= 3);
+            }
+            if (btnEliminar != null) {
+                btnEliminar.setVisible(nivel >= 4);
+                btnEliminar.setManaged(nivel >= 4);
+            }
+        }
     }
 
     private void configurarTabla() {
@@ -76,11 +137,11 @@ public class ClientesController extends BaseController {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/mx/nanosip/nanosip/CrClientes.fxml"));
-            Parent root = loader.load();                          // ← primero load()
-            CrClientesController modal = loader.getController(); // ← luego getController()
+            Parent root = loader.load();
+            CrClientesController modal = loader.getController();
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-            modal.setModalStage(stage);                          // ← luego setModalStage
+            modal.setModalStage(stage);
             stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {
@@ -97,12 +158,12 @@ public class ClientesController extends BaseController {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/mx/nanosip/nanosip/CrClientes.fxml"));
-            Parent root = loader.load();                          // ← primero load()
-            CrClientesController modal = loader.getController(); // ← luego getController()
+            Parent root = loader.load();
+            CrClientesController modal = loader.getController();
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-            modal.setModalStage(stage);                          // ← luego setModalStage
-            modal.setCliente(seleccionado);                      // ← al final setCliente
+            modal.setModalStage(stage);
+            modal.setCliente(seleccionado);
             stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {
@@ -134,5 +195,38 @@ public class ClientesController extends BaseController {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+    @FXML
+    public void cerrarSesion() {
+        try {
+            // 1. Cargamos el diseño del Login
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/Login.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            // 2. Creamos la ventanita nueva y sin bordes
+            javafx.stage.Stage loginStage = new javafx.stage.Stage();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            loginStage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            loginStage.setScene(scene);
+            loginStage.centerOnScreen();
+            loginStage.show();
+
+            // 3. Cerramos la ventana actual gigante
+            // (Asegúrate de tener declarada la variable @FXML private HBox topbar; o usa cualquier otro ID que tengas en la pantalla)
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) topbar.getScene().getWindow();
+            currentStage.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void aplicarVisibilidadMenu(Button boton, char nivelPermiso) {
+        if (boton != null) {
+            boolean tieneAcceso = nivelPermiso != '0';
+            boton.setVisible(tieneAcceso);
+            boton.setManaged(tieneAcceso); // Esto hace que el espacio del botón desaparezca y los demás se recorran
+        }
     }
 }
