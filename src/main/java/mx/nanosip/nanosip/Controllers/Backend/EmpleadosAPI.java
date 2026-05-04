@@ -2,6 +2,7 @@ package mx.nanosip.nanosip.Controllers.Backend;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import mx.nanosip.nanosip.Controllers.ConexionApi;
 
 import java.net.URI;
 import java.net.http.*;
@@ -10,8 +11,8 @@ import java.util.List;
 public class EmpleadosAPI {
 
     private static final String BASE = "http://localhost:8080/api/empleados";
-    private static final HttpClient client = HttpClient.newHttpClient();
-    private static final Gson gson = new Gson();
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final Gson gson = new Gson();
 
     // ── GET todos ────────────────────────────────────────────
     public List<Empleados> obtenerTodos() throws Exception {
@@ -66,5 +67,30 @@ public class EmpleadosAPI {
                 .build();
 
         client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public Empleados login(String usuario, String contrasena) throws Exception {
+        Empleados credenciales = new Empleados();
+        credenciales.setNombre(usuario); // Enviamos el nombre
+        credenciales.setContrasena(contrasena);
+
+        String json = gson.toJson(credenciales);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/login"))
+                .header("Content-Type", "application/json")
+                .timeout(java.time.Duration.ofSeconds(10))
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            return gson.fromJson(response.body(), Empleados.class);
+        } else if (response.statusCode() == 401 || response.statusCode() == 404) {
+            throw new Exception("Usuario o contraseña incorrectos.");
+        } else {
+            throw new Exception("Error del servidor: " + response.statusCode());
+        }
     }
 }

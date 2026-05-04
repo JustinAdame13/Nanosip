@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="370.0" prefWidth="350.0" styleClass="root-pane" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.LoginController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="370.0" prefWidth="350.0" styleClass="root-pane" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.LoginController">
 
    <top>
       <HBox fx:id="topbar" alignment="CENTER_RIGHT" prefHeight="35.0" styleClass="topbar">
@@ -36,8 +36,8 @@
          <HBox prefHeight="10" />
 
          <!-- Campos -->
-         <TextField fx:id="IDField" maxWidth="Infinity" promptText="ID de usuario" styleClass="login-field" />
-         <PasswordField fx:id="PasswordField" maxWidth="Infinity" promptText="Contraseña" styleClass="login-field" />
+         <TextField fx:id="txtUsuario" maxWidth="Infinity" promptText="Nombre de usuario" styleClass="login-field" />
+         <PasswordField fx:id="txtPassword" maxWidth="Infinity" promptText="Contraseña" styleClass="login-field" />
 
          <HBox prefHeight="6" />
 

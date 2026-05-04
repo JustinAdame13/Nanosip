@@ -57,6 +57,7 @@ public class CrEmpleadosController implements ModalController {
     //  Inicialización
     // ─────────────────────────────────────────────────────────
     @FXML
+
     public void initialize() {
         spnEdad.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(18, 99, 18));

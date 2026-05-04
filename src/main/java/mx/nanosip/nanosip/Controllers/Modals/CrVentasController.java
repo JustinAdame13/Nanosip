@@ -123,6 +123,12 @@ public class CrVentasController implements ModalController {
     // ─────────────────────────────────────────────────────────
     @FXML
     public void initialize() {
+        if (txtIdEmpleado != null) {
+            txtIdEmpleado.setEditable(false);
+
+            // Opcional: Si además quieres que se vea "gris" para que sea obvio que está bloqueado:
+            txtIdEmpleado.setDisable(true);
+        }
         cargarClientes();
         cargarProductos();
         configurarBuscadorCliente();
@@ -244,21 +250,42 @@ public class CrVentasController implements ModalController {
         if (!validar()) return;
 
         try {
-            double total = filas.stream().mapToDouble(FilaProducto::getSubtotal).sum() * 1.16;
-            int idEmpleado = txtIdEmpleado.getText().isBlank() ? 1
-                    : Integer.parseInt(txtIdEmpleado.getText().trim());
+            // 1. Calculamos el total automático sumando los productos (con IVA del 16%)
+            double totalCalculado = filas.stream().mapToDouble(FilaProducto::getSubtotal).sum() * 1.16;
 
+            // 2. Sacamos el ID del empleado desde la Bóveda Global (Sesión)
+            int idVendedor = mx.nanosip.nanosip.Controllers.Backend.Sesion.getInstance().getUsuarioActual().getId();
+
+            // 3. Obtenemos el ID del cliente
+            Integer idCliente = clienteSeleccionado.getId();
+
+            // 💡 USAMOS TU VARIABLE: ventaEditar
             if (ventaEditar == null) {
-                Ventas nueva = new Ventas(idEmpleado, clienteSeleccionado.getId(), total);
-                nueva.setFecha(LocalDateTime.now());
+                // ── CREAR NUEVA VENTA ──
+                Ventas nueva = new Ventas();
+
+                nueva.setIdEmpleado(idVendedor); // ¡ID Automático!
+                nueva.setIdClientes(idCliente);
+                nueva.setMonto(totalCalculado);  // ¡Total Automático!
+
+                // 💡 USAMOS TU API Y MÉTODO: apiVentas.guardar()
                 apiVentas.guardar(nueva);
+
             } else {
-                ventaEditar.setIdClientes(clienteSeleccionado.getId());
-                ventaEditar.setMonto(total);
+                // ── EDITAR VENTA EXISTENTE ──
+                ventaEditar.setIdClientes(idCliente);
+                ventaEditar.setMonto(totalCalculado);
+                // OJO: Por seguridad, no actualizamos el IdEmpleado al editar,
+                // porque la venta original la hizo quien la hizo.
+
+                // 💡 USAMOS TU API Y MÉTODO: apiVentas.actualizar()
                 apiVentas.actualizar(ventaEditar);
             }
+
             cerrarModal();
+
         } catch (Exception e) {
+            // 💡 USAMOS TU MÉTODO DE ALERTA: mostrarError()
             mostrarError("Error al registrar venta: " + e.getMessage());
         }
     }
