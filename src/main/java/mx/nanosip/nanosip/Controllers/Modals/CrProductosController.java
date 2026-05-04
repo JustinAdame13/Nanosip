@@ -71,6 +71,29 @@ public class CrProductosController implements ModalController {
         spnExistencia.getValueFactory().setValue(p.getInventario());
         txtPrecio.setText(String.valueOf(p.getPrecio()));
         txtCosto .setText(String.valueOf(p.getCosto()));
+
+
+        todosProveedores.forEach(cb -> cb.setSelected(false));
+
+        try {
+            // 1. Llamamos a la API que ya devuelve el JSON que viste en el navegador
+            List<Integer> idsAsignados = apiProductos.obtenerIdsProveedoresPorProducto(p.getClave());
+
+            // 2. Marcamos visualmente los CheckBoxes
+            for (CheckBox cb : todosProveedores) {
+                // MUY IMPORTANTE: Asegúrate de que al cargar los CheckBoxes
+                // les hayas asignado el ID del proveedor en el UserData
+                Integer idProvEnCheckBox = (Integer) cb.getUserData();
+
+                if (idsAsignados.contains(idProvEnCheckBox)) {
+                    cb.setSelected(true);
+                } else {
+                    cb.setSelected(false);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al marcar proveedores: " + e.getMessage());
+        }
     }
 
     private void filtrarProveedores(String filtro) {
@@ -101,25 +124,42 @@ public class CrProductosController implements ModalController {
             double costo      = Double.parseDouble(txtCosto.getText().trim());
             int    existencia = spnExistencia.getValue();
 
+            int claveProductoFinal;
+
             if (productoEditar == null) {
-                apiProductos.guardar(new Productos(
+                // ── CREAR NUEVO ──
+                Productos nuevo = new Productos(
                         txtNombre.getText().trim(),
                         txtMarca.getText().trim(),
                         txtDescripcion.getText().trim(),
-                        existencia, precio, costo));
+                        existencia, precio, costo);
+
+                // Importante: Tu API debe retornar el objeto con la Clave generada
+                Productos guardado = apiProductos.guardar(nuevo);
+                claveProductoFinal = guardado.getClave();
             } else {
-                productoEditar.setNombre     (txtNombre.getText().trim());
-                productoEditar.setMarca      (txtMarca.getText().trim());
+                // ── EDITAR EXISTENTE ──
+                claveProductoFinal = productoEditar.getClave();
+                productoEditar.setNombre(txtNombre.getText().trim());
+                productoEditar.setMarca(txtMarca.getText().trim());
                 productoEditar.setDescripcion(txtDescripcion.getText().trim());
-                productoEditar.setInventario (existencia);
-                productoEditar.setPrecio     (precio);
-                productoEditar.setCosto      (costo);
+                productoEditar.setInventario(existencia);
+                productoEditar.setPrecio(precio);
+                productoEditar.setCosto(costo);
+
                 apiProductos.actualizar(productoEditar);
+
+                // Limpiamos los proveedores anteriores para re-insertar los nuevos
+                apiProductos.eliminarProveedoresDeProducto(claveProductoFinal);
             }
-            System.out.println("Proveedores seleccionados: " + getIdsProveedoresSeleccionados());
+
+            // ── GUARDAR RELACIÓN CON PROVEEDORES ──
+            List<Integer> proveedoresIds = getIdsProveedoresSeleccionados();
+            for (Integer idProv : proveedoresIds) {
+                apiProductos.guardarProveedorProducto(claveProductoFinal, idProv);
+            }
+
             cerrarModal();
-        } catch (NumberFormatException e) {
-            alerta("Precio y costo deben ser números válidos.");
         } catch (Exception e) {
             alerta("Error al guardar: " + e.getMessage());
         }
