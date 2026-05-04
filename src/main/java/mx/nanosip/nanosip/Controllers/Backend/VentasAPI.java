@@ -5,18 +5,33 @@ import com.google.gson.reflect.TypeToken;
 
 import java.net.URI;
 import java.net.http.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class VentasAPI {
 
     private static final String BASE = "http://localhost:8080/api/ventas";
     private static final HttpClient client = HttpClient.newHttpClient();
+
     private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(java.time.LocalDateTime.class,
-                    (JsonDeserializer<java.time.LocalDateTime>) (json, type, ctx) ->
-                            java.time.LocalDateTime.parse(json.getAsString()))
-            .registerTypeAdapter(java.time.LocalDateTime.class,
-                    (JsonSerializer<java.time.LocalDateTime>) (src, type, ctx) ->
+            // ✅ DESERIALIZADOR CORREGIDO
+            .registerTypeAdapter(LocalDateTime.class,
+                    (JsonDeserializer<LocalDateTime>) (json, type, ctx) -> {
+                        if (json.isJsonArray()) {
+                            JsonArray a = json.getAsJsonArray();
+                            return LocalDateTime.of(
+                                    a.get(0).getAsInt(),
+                                    a.get(1).getAsInt(),
+                                    a.get(2).getAsInt(),
+                                    a.get(3).getAsInt(),
+                                    a.get(4).getAsInt()
+                            );
+                        }
+                        return LocalDateTime.parse(json.getAsString());
+                    })
+            // ✅ SERIALIZADOR (se deja igual)
+            .registerTypeAdapter(LocalDateTime.class,
+                    (JsonSerializer<LocalDateTime>) (src, type, ctx) ->
                             new JsonPrimitive(src.toString()))
             .create();
 
@@ -50,7 +65,6 @@ public class VentasAPI {
         return gson.fromJson(res.body(), Ventas.class);
     }
 
-
     // ── PUT editar ───────────────────────────────────────────
     public void actualizar(Ventas venta) throws Exception {
         String json = gson.toJson(venta);
@@ -74,18 +88,19 @@ public class VentasAPI {
         client.send(req, HttpResponse.BodyHandlers.ofString());
     }
 
-
-    // 2. Guardar un detalle de producto
+    // ── Guardar detalle ──────────────────────────────────────
     public void guardarDetalle(VentasProductos detalle) throws Exception {
         String json = gson.toJson(detalle);
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/ventas-productos")) // Tu endpoint de la tabla intermedia
+                .uri(URI.create("http://localhost:8080/api/ventas-productos"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
+
         client.send(req, HttpResponse.BodyHandlers.ofString());
     }
 
+    // ── Eliminar detalles ────────────────────────────────────
     public void eliminarDetalles(int numeroVenta) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
@@ -99,6 +114,7 @@ public class VentasAPI {
         }
     }
 
+    // ── Obtener detalles ─────────────────────────────────────
     public List<VentasProductos> obtenerDetalles(int numeroVenta) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))

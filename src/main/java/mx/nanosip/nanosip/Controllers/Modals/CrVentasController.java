@@ -133,6 +133,9 @@ public class CrVentasController implements ModalController {
         cargarProductos();
         configurarBuscadorCliente();
         agregarFila(); // Una fila vacía de inicio
+        Empleados actual = Sesion.getInstance().getUsuarioActual();
+        if (actual != null) txtIdEmpleado.setText(String.valueOf(actual.getId()));
+
     }
 
     private void cargarClientes() {
@@ -270,6 +273,16 @@ public class CrVentasController implements ModalController {
 
                 // 💡 USAMOS TU API Y MÉTODO: apiVentas.guardar()
                 apiVentas.guardar(nueva);
+                // Guardar cada producto de la venta
+                Ventas ventaGuardada = apiVentas.guardar(nueva);
+
+                for (FilaProducto fila : filas) {
+                    VentasProductos detalle = new VentasProductos();
+                    detalle.setNumeroVenta(ventaGuardada.getNumero());
+                    detalle.setClaveProducto(fila.cmbProducto.getValue().getClave());
+                    detalle.setCantidad(Integer.parseInt(fila.txtCantidad.getText().trim()));
+                    apiVentas.guardarDetalle(detalle);
+                }
 
             } else {
                 // ── EDITAR VENTA EXISTENTE ──
@@ -289,6 +302,7 @@ public class CrVentasController implements ModalController {
             mostrarError("Error al registrar venta: " + e.getMessage());
         }
     }
+
 
     // ─────────────────────────────────────────────────────────
     //  Validación

@@ -200,7 +200,7 @@ public class CrEmpleadosController implements ModalController {
                 api.actualizar(empleadoEditando);
             }
 
-            ((Stage) txtNombre.getScene().getWindow()).close();
+//            ((Stage) txtNombre.getScene().getWindow()).close();
 
         } catch (Exception e) {
             mostrarAlerta("Error: " + e.getMessage());

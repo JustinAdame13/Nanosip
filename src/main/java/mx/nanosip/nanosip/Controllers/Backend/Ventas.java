@@ -9,7 +9,7 @@ public class Ventas {
     private LocalDateTime fecha;
     private String productos;
     private double monto;
-    private int cantidadTotal;
+    private Integer cantidadTotal;
 
     public Ventas() {}
 
