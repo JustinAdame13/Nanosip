@@ -22,6 +22,14 @@ import mx.nanosip.nanosip.Controllers.Backend.Sesion;
 import java.io.IOException;
 import java.util.List;
 
+import javafx.scene.control.cell.PropertyValueFactory;
+import mx.nanosip.nanosip.Controllers.Backend.VentasProductos;
+import mx.nanosip.nanosip.Controllers.Backend.VentasProductosAPI;
+import mx.nanosip.nanosip.Controllers.Backend.ProductosAPI;
+import mx.nanosip.nanosip.Controllers.Backend.Productos;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class VentasController extends BaseController {
 
     @FXML private TextField txtBusqueda;
@@ -30,11 +38,12 @@ public class VentasController extends BaseController {
     @FXML private TableColumn<Ventas, Integer> colEmpleado;
     @FXML private TableColumn<Ventas, Integer> colCliente;
     @FXML private TableColumn<Ventas, Double>  colMonto;
-    @FXML private TableColumn<Ventas, ?>       colProducto;
-    @FXML private TableColumn<Ventas, ?>       colCantidad;
+    @FXML private TableColumn<Ventas, String>  colProducto;
+    @FXML private TableColumn<Ventas, String>  colCantidad;
 
     // ── BOTONES PARA CONTROLAR PERMISOS ──
-    @FXML private Button btnNuevo;
+    @FXML private Button btnReporte;
+    @FXML private Button btnCrear;
     @FXML private Button btnEditar;
     @FXML private Button btnEliminar;
 
@@ -77,19 +86,16 @@ public class VentasController extends BaseController {
     private void configurarPermisos() {
         Empleados usuario = Sesion.getInstance().getUsuarioActual();
 
-        // Validamos que exista una sesión y que la cadena tenga al menos 5 dígitos
         if (usuario != null && usuario.getPermisos() != null && usuario.getPermisos().length() >= 5) {
-            // Sacamos el nivel del módulo de Ventas (Posición 1 en la cadena)
             int nivel = Character.getNumericValue(usuario.getPermisos().charAt(1));
 
-            // Nivel 1 = Solo ver (El menú se encarga de mostrar u ocultar la pantalla completa)
-            // Nivel 2 = Crear (>= 2)
-            // Nivel 3 = Editar (>= 3)
-            // Nivel 4 = Eliminar (>= 4)
-
-            if (btnNuevo != null) {
-                btnNuevo.setVisible(nivel >= 2);
-                btnNuevo.setManaged(nivel >= 2); // Oculta el espacio físico del botón si es false
+            if (btnReporte != null) {
+                btnReporte.setVisible(nivel >= 1);
+                btnReporte.setManaged(nivel >= 1);
+            }
+            if (btnCrear != null) {
+                btnCrear.setVisible(nivel >= 2);
+                btnCrear.setManaged(nivel >= 2);
             }
             if (btnEditar != null) {
                 btnEditar.setVisible(nivel >= 3);
@@ -107,7 +113,43 @@ public class VentasController extends BaseController {
         colEmpleado.setCellValueFactory(new PropertyValueFactory<>("idEmpleado"));
         colCliente .setCellValueFactory(new PropertyValueFactory<>("idClientes"));
         colMonto   .setCellValueFactory(new PropertyValueFactory<>("monto"));
-        // colProducto y colCantidad se mapean cuando el backend los soporte
+
+        // Columna de productos — nombres separados por comas
+        colProducto.setCellValueFactory(cellData -> {
+            Ventas venta = cellData.getValue();
+            try {
+                VentasProductosAPI detallesApi = new VentasProductosAPI();
+                List<VentasProductos> detalles = detallesApi.obtenerPorVenta(venta.getNumero());
+                List<Productos> catalogo = ProductosAPI.obtenerTodos();
+
+                String nombres = detalles.stream()
+                        .map(d -> catalogo.stream()
+                                .filter(p -> p.getClave().equals(d.getClaveProducto()))
+                                .map(Productos::getNombre)
+                                .findFirst()
+                                .orElse("ID:" + d.getClaveProducto()))
+                        .collect(Collectors.joining(", "));
+
+                return new javafx.beans.property.SimpleStringProperty(nombres);
+            } catch (Exception e) {
+                return new javafx.beans.property.SimpleStringProperty("—");
+            }
+        });
+
+        // Columna de cantidad total
+        colCantidad.setCellValueFactory(cellData -> {
+            Ventas venta = cellData.getValue();
+            try {
+                VentasProductosAPI detallesApi = new VentasProductosAPI();
+                List<VentasProductos> detalles = detallesApi.obtenerPorVenta(venta.getNumero());
+                int total = detalles.stream()
+                        .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
+                        .sum();
+                return new javafx.beans.property.SimpleStringProperty(String.valueOf(total));
+            } catch (Exception e) {
+                return new javafx.beans.property.SimpleStringProperty("0");
+            }
+        });
     }
 
     private void cargarDatos() {

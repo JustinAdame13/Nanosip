@@ -33,7 +33,8 @@ public class ProveedoresController extends BaseController {
     @FXML private TableColumn<Proveedores, String>  colTelefono;
 
     // ── BOTONES PARA CONTROLAR PERMISOS ──
-    @FXML private Button btnNuevo;
+    @FXML private Button btnReporte;
+    @FXML private Button btnCrear;
     @FXML private Button btnEditar;
     @FXML private Button btnEliminar;
 
@@ -77,17 +78,15 @@ public class ProveedoresController extends BaseController {
         Empleados usuario = Sesion.getInstance().getUsuarioActual();
 
         if (usuario != null && usuario.getPermisos() != null && usuario.getPermisos().length() >= 5) {
-            // Sacamos el nivel del módulo de Proveedores (Posición 4)
             int nivel = Character.getNumericValue(usuario.getPermisos().charAt(4));
 
-            // Nivel 1 = Solo ver
-            // Nivel 2 = Crear (>= 2)
-            // Nivel 3 = Editar (>= 3)
-            // Nivel 4 = Eliminar (>= 4)
-
-            if (btnNuevo != null) {
-                btnNuevo.setVisible(nivel >= 2);
-                btnNuevo.setManaged(nivel >= 2);
+            if (btnReporte != null) {
+                btnReporte.setVisible(nivel >= 1);
+                btnReporte.setManaged(nivel >= 1);
+            }
+            if (btnCrear != null) {
+                btnCrear.setVisible(nivel >= 2);
+                btnCrear.setManaged(nivel >= 2);
             }
             if (btnEditar != null) {
                 btnEditar.setVisible(nivel >= 3);

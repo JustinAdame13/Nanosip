@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.stage.Popup;
+import javafx.scene.layout.VBox;
+
 public class CrVentasController implements ModalController {
 
     @FXML private Label     lblTitulo;
@@ -26,6 +29,8 @@ public class CrVentasController implements ModalController {
     @FXML private Label     lblSubtotal;
     @FXML private Label     lblIva;
     @FXML private Label     lblTotal;
+
+    private Popup popupClientes;
 
     private Stage    modalStage;
     private Ventas   ventaEditar          = null;
@@ -158,12 +163,16 @@ public class CrVentasController implements ModalController {
     //  Buscador de clientes con dropdown
     // ─────────────────────────────────────────────────────────
     private void configurarBuscadorCliente() {
+        // Creamos el Popup una sola vez
+        popupClientes = new Popup();
+        popupClientes.setAutoHide(true);
+
         txtBuscarCliente.textProperty().addListener((obs, ant, nuevo) -> {
             if (nuevo == null || nuevo.isBlank()) {
-                dropdownClientes.setVisible(false);
-                dropdownClientes.setManaged(false);
+                popupClientes.hide();
                 return;
             }
+
             String f = nuevo.toLowerCase().trim();
             List<Clientes> filtrados = todosClientes.stream()
                     .filter(c -> c.getNombre().toLowerCase().contains(f)
@@ -171,19 +180,63 @@ public class CrVentasController implements ModalController {
                             || c.getTelefono().contains(f))
                     .toList();
 
-            dropdownClientes.getChildren().clear();
-            for (Clientes c : filtrados) {
-                Label opcion = new Label(c.getNombre() + "  |  " + c.getRfc());
-                opcion.setMaxWidth(Double.MAX_VALUE);
-                opcion.setPadding(new Insets(6, 12, 6, 12));
-                opcion.getStyleClass().add("dropdown-item");
-                opcion.setOnMouseClicked(e -> seleccionarCliente(c));
-                dropdownClientes.getChildren().add(opcion);
+            if (filtrados.isEmpty()) {
+                popupClientes.hide();
+                return;
             }
 
-            boolean hay = !filtrados.isEmpty();
-            dropdownClientes.setVisible(hay);
-            dropdownClientes.setManaged(hay);
+            // Construimos el contenido del popup
+            VBox contenido = new VBox();
+            contenido.getStylesheets().add(
+                    getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+            );
+            contenido.getStyleClass().add("search-dropdown");
+            contenido.setMaxWidth(txtBuscarCliente.getWidth());
+            contenido.setMinWidth(txtBuscarCliente.getWidth());
+
+            for (Clientes c : filtrados) {
+                javafx.scene.control.Label opcion =
+                        new javafx.scene.control.Label(c.getNombre() + "  |  " + c.getRfc());
+                opcion.setMaxWidth(Double.MAX_VALUE);
+                opcion.setPadding(new javafx.geometry.Insets(6, 12, 6, 12));
+                opcion.getStyleClass().add("dropdown-item");
+                opcion.setOnMouseClicked(e -> {
+                    seleccionarCliente(c);
+                    popupClientes.hide();
+                });
+                contenido.getChildren().add(opcion);
+            }
+
+            popupClientes.getContent().clear();
+            popupClientes.getContent().add(contenido);
+
+            // Posicionamos el popup justo debajo del campo de búsqueda
+            javafx.geometry.Bounds bounds = txtBuscarCliente.localToScreen(
+                    txtBuscarCliente.getBoundsInLocal()
+            );
+
+            if (!popupClientes.isShowing()) {
+                popupClientes.show(
+                        txtBuscarCliente,
+                        bounds.getMinX(),
+                        bounds.getMaxY() + 2
+                );
+            } else {
+                // Ya estaba abierto, solo actualizamos posición
+                popupClientes.setX(bounds.getMinX());
+                popupClientes.setY(bounds.getMaxY() + 2);
+            }
+        });
+
+        // Ocultamos el popup si el campo pierde foco
+        txtBuscarCliente.focusedProperty().addListener((obs, ant, nuevo) -> {
+            if (!nuevo) {
+                // Pequeño delay para permitir que el click en una opción se registre
+                javafx.animation.PauseTransition pause =
+                        new javafx.animation.PauseTransition(javafx.util.Duration.millis(150));
+                pause.setOnFinished(e -> popupClientes.hide());
+                pause.play();
+            }
         });
     }
 

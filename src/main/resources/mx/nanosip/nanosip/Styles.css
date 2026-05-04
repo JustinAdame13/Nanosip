@@ -629,3 +629,91 @@
        -fx-min-width: 90;
        -fx-alignment: CENTER_RIGHT;
    }
+   /* ══════════════════════════════════════════
+      COMBOBOX — tema Nanosip
+      ══════════════════════════════════════════ */
+   .combo-box {
+       -fx-background-color: #F5F3FA;
+       -fx-background-radius: 8;
+       -fx-border-color: #E2DEEE;
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+       -fx-font-size: 13px;
+       -fx-font-family: "Segoe UI", sans-serif;
+   }
+   .combo-box:focused {
+       -fx-border-color: #725AC1;
+       -fx-effect: dropshadow(gaussian, rgba(114,90,193,0.25), 10, 0, 0, 0);
+   }
+   .combo-box .list-cell {
+       -fx-background-color: transparent;
+       -fx-text-fill: #242038;
+       -fx-padding: 6 12 6 12;
+   }
+   .combo-box-popup .list-view {
+       -fx-background-color: #FFFFFF;
+       -fx-background-radius: 8;
+       -fx-border-color: #725AC1;
+       -fx-border-radius: 8;
+       -fx-border-width: 1.5;
+       -fx-effect: dropshadow(gaussian, rgba(114,90,193,0.25), 12, 0, 0, 4);
+   }
+   .combo-box-popup .list-view .list-cell {
+       -fx-background-color: transparent;
+       -fx-text-fill: #242038;
+       -fx-font-size: 12px;
+       -fx-padding: 7 14 7 14;
+   }
+   .combo-box-popup .list-view .list-cell:hover {
+       -fx-background-color: #EDE9FA;
+       -fx-text-fill: #725AC1;
+   }
+   .combo-box-popup .list-view .list-cell:selected {
+       -fx-background-color: #DDD5F5;
+       -fx-text-fill: #242038;
+   }
+   .combo-box .arrow-button {
+       -fx-background-color: transparent;
+   }
+   .combo-box .arrow {
+       -fx-background-color: #725AC1;
+   }
+
+   /* ══════════════════════════════════════════
+      SCROLLPANE — tema Nanosip
+      ══════════════════════════════════════════ */
+   .scroll-pane {
+       -fx-background-color: transparent;
+       -fx-border-color: transparent;
+   }
+   .scroll-pane > .viewport {
+       -fx-background-color: transparent;
+   }
+   .scroll-bar:vertical,
+   .scroll-bar:horizontal {
+       -fx-background-color: #F5F3FA;
+       -fx-background-radius: 8;
+   }
+   .scroll-bar:vertical .track,
+   .scroll-bar:horizontal .track {
+       -fx-background-color: #E2DEEE;
+       -fx-background-radius: 8;
+   }
+   .scroll-bar:vertical .thumb,
+   .scroll-bar:horizontal .thumb {
+       -fx-background-color: #8D86C9;
+       -fx-background-radius: 8;
+   }
+   .scroll-bar:vertical .thumb:hover,
+   .scroll-bar:horizontal .thumb:hover {
+       -fx-background-color: #725AC1;
+   }
+   .scroll-bar .increment-button,
+   .scroll-bar .decrement-button {
+       -fx-background-color: transparent;
+       -fx-padding: 2;
+   }
+   .scroll-bar .increment-arrow,
+   .scroll-bar .decrement-arrow {
+       -fx-background-color: #8D86C9;
+   }

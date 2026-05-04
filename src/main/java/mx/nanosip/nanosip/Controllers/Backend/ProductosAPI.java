@@ -35,7 +35,9 @@ public class ProductosAPI {
         if (res.statusCode() != 200 && res.statusCode() != 201) {
             throw new RuntimeException("Error al guardar: " + res.body());
         }
-        return prod;
+
+        // Parseamos la respuesta para obtener la clave generada por la BD
+        return gson.fromJson(res.body(), Productos.class);
     }
 
     // ── PUT editar ───────────────────────────────────────────
