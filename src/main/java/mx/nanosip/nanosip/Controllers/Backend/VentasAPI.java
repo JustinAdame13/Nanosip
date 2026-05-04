@@ -1,0 +1,113 @@
+package mx.nanosip.nanosip.Controllers.Backend;
+
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
+import java.net.URI;
+import java.net.http.*;
+import java.util.List;
+
+public class VentasAPI {
+
+    private static final String BASE = "http://localhost:8080/api/ventas";
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(java.time.LocalDateTime.class,
+                    (JsonDeserializer<java.time.LocalDateTime>) (json, type, ctx) ->
+                            java.time.LocalDateTime.parse(json.getAsString()))
+            .registerTypeAdapter(java.time.LocalDateTime.class,
+                    (JsonSerializer<java.time.LocalDateTime>) (src, type, ctx) ->
+                            new JsonPrimitive(src.toString()))
+            .create();
+
+    // ── GET todos ────────────────────────────────────────────
+    public List<Ventas> obtenerTodos() throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE))
+                .GET()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+        return gson.fromJson(res.body(), new TypeToken<List<Ventas>>(){}.getType());
+    }
+
+    // ── POST crear ───────────────────────────────────────────
+    public Ventas guardar(Ventas venta) throws Exception {
+        String json = gson.toJson(venta);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200 && res.statusCode() != 201) {
+            throw new RuntimeException("Error al guardar: " + res.body());
+        }
+
+        return gson.fromJson(res.body(), Ventas.class);
+    }
+
+
+    // ── PUT editar ───────────────────────────────────────────
+    public void actualizar(Ventas venta) throws Exception {
+        String json = gson.toJson(venta);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/" + venta.getNumero()))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    // ── DELETE eliminar ──────────────────────────────────────
+    public void eliminar(int numero) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/" + numero))
+                .DELETE()
+                .build();
+
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+
+    // 2. Guardar un detalle de producto
+    public void guardarDetalle(VentasProductos detalle) throws Exception {
+        String json = gson.toJson(detalle);
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/ventas-productos")) // Tu endpoint de la tabla intermedia
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        client.send(req, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public void eliminarDetalles(int numeroVenta) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
+                .DELETE()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200 && res.statusCode() != 204) {
+            throw new RuntimeException("Error al limpiar productos anteriores: " + res.body());
+        }
+    }
+
+    public List<VentasProductos> obtenerDetalles(int numeroVenta) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
+                .GET()
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        return gson.fromJson(res.body(),
+                new TypeToken<List<VentasProductos>>(){}.getType());
+    }
+}
