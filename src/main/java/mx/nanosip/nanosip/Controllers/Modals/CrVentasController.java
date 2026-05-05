@@ -12,7 +12,9 @@ import mx.nanosip.nanosip.Controllers.Backend.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.stage.Popup;
 import javafx.scene.layout.VBox;
@@ -46,13 +48,17 @@ public class CrVentasController implements ModalController {
     // Cada fila dinámica de la tabla de productos
     private final List<FilaProducto> filas = new ArrayList<>();
 
+    // Mapa que guarda las cantidades originales de la venta que se está editando
+    // clave = claveProducto, valor = cantidad original
+    private final Map<Integer, Integer> stockOriginal = new HashMap<>();
+
     // ─────────────────────────────────────────────────────────
     //  Inner class: fila de producto
     // ─────────────────────────────────────────────────────────
     private class FilaProducto {
-        final HBox              hbox;
+        final HBox                hbox;
         final ComboBox<Productos> cmbProducto;
-        final TextField           txtCantidad;
+        final Spinner<Integer>    spnCantidad;
         final Label               lblPrecioUnit;
         final Label               lblSubtotalFila;
 
@@ -67,10 +73,14 @@ public class CrVentasController implements ModalController {
                 public Productos fromString(String s) { return null; }
             });
 
-            // ── Cantidad ──────────────────────────────────────
-            txtCantidad = new TextField("1");
-            txtCantidad.setPrefWidth(70);
-            txtCantidad.setAlignment(Pos.CENTER);
+            // ── Spinner de cantidad ───────────────────────────
+            SpinnerValueFactory.IntegerSpinnerValueFactory factory =
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1, 1);
+            spnCantidad = new Spinner<>();
+            spnCantidad.setValueFactory(factory);
+            spnCantidad.setEditable(true);
+            spnCantidad.setPrefWidth(80);
+            spnCantidad.getStyleClass().add("modal-spinner");
 
             // ── Precio unitario ───────────────────────────────
             lblPrecioUnit = new Label("$0.00");
@@ -88,38 +98,67 @@ public class CrVentasController implements ModalController {
             btnEliminar.getStyleClass().add("wmbtn-close");
             btnEliminar.setOnAction(e -> eliminarFila(this));
 
-            // ── Listeners para recalcular ─────────────────────
+            // ── Listener producto seleccionado ────────────────
             cmbProducto.valueProperty().addListener((obs, ant, nuevo) -> {
                 if (nuevo != null) {
                     lblPrecioUnit.setText(String.format("$%.2f", nuevo.getPrecio()));
+
+                    // Calcular stock real disponible (restando lo que usan otras filas del mismo producto)
+                    int stockDisponible = calcularStockDisponible(nuevo, this);
+                    factory.setMax(stockDisponible);
+                    factory.setValue(Math.min(factory.getValue(), stockDisponible));
                 } else {
                     lblPrecioUnit.setText("$0.00");
+                    factory.setMax(1);
                 }
                 actualizarSubtotalFila(this);
                 recalcularTotales();
             });
 
-            txtCantidad.textProperty().addListener((obs, ant, nuevo) -> {
+            // ── Listener cantidad ─────────────────────────────
+            spnCantidad.valueProperty().addListener((obs, ant, nuevo) -> {
+                if (nuevo != null && cmbProducto.getValue() != null) {
+                    int stockDisponible = calcularStockDisponible(cmbProducto.getValue(), this);
+                    if (nuevo > stockDisponible) {
+                        factory.setValue(stockDisponible);
+                        return;
+                    }
+                }
+                actualizarSubtotalFila(this);
+                recalcularTotales();
+            });
+
+            // Validar también cuando se escribe directo en el spinner
+            spnCantidad.getEditor().textProperty().addListener((obs, ant, nuevo) -> {
+                try {
+                    int valor = Integer.parseInt(nuevo);
+                    if (cmbProducto.getValue() != null) {
+                        int stockDisponible = calcularStockDisponible(cmbProducto.getValue(), this);
+                        if (valor > stockDisponible) {
+                            spnCantidad.getEditor().setText(String.valueOf(stockDisponible));
+                        } else if (valor < 1) {
+                            spnCantidad.getEditor().setText("1");
+                        }
+                    }
+                } catch (NumberFormatException ignored) {}
                 actualizarSubtotalFila(this);
                 recalcularTotales();
             });
 
             // ── Ensamble del HBox ─────────────────────────────
-            hbox = new HBox(8, cmbProducto, txtCantidad, lblPrecioUnit, lblSubtotalFila, btnEliminar);
+            hbox = new HBox(8, cmbProducto, spnCantidad, lblPrecioUnit, lblSubtotalFila, btnEliminar);
             hbox.setAlignment(Pos.CENTER_LEFT);
             hbox.setPadding(new Insets(2, 4, 2, 4));
-            HBox.setHgrow(cmbProducto, Priority.NEVER);
         }
 
         double getSubtotal() {
             Productos p = cmbProducto.getValue();
             if (p == null) return 0;
-            try {
-                int cant = Integer.parseInt(txtCantidad.getText().trim());
-                return p.getPrecio() * cant;
-            } catch (NumberFormatException e) {
-                return 0;
-            }
+            return p.getPrecio() * spnCantidad.getValue();
+        }
+
+        int getCantidad() {
+            return spnCantidad.getValue();
         }
     }
 
@@ -298,31 +337,33 @@ public class CrVentasController implements ModalController {
         txtNumVenta.setText(String.valueOf(v.getNumero()));
         txtIdEmpleado.setText(String.valueOf(v.getIdEmpleado()));
 
-        // Preseleccionar cliente sin activar el popup
         todosClientes.stream()
                 .filter(c -> c.getId().equals(v.getIdClientes()))
                 .findFirst()
                 .ifPresent(this::seleccionarCliente);
 
-        // Limpiar la fila vacía inicial
         filas.clear();
         contenedorFilas.getChildren().clear();
+        stockOriginal.clear();
 
-        // Cargar los productos y cantidades reales de la venta
         try {
             List<VentasProductos> detalles = apiVentas.obtenerDetalles(v.getNumero());
 
             for (VentasProductos detalle : detalles) {
+                // Guardamos las cantidades originales para calcular stock disponible correctamente
+                stockOriginal.merge(detalle.getClaveProducto(),
+                        detalle.getCantidad() != null ? detalle.getCantidad() : 0,
+                        Integer::sum);
+
                 FilaProducto fila = new FilaProducto(todosProductos);
 
-                // Buscar y seleccionar el producto correcto en el ComboBox
                 todosProductos.stream()
                         .filter(p -> p.getClave().equals(detalle.getClaveProducto()))
                         .findFirst()
                         .ifPresent(fila.cmbProducto::setValue);
 
-                // Poner la cantidad
-                fila.txtCantidad.setText(String.valueOf(detalle.getCantidad()));
+                fila.spnCantidad.getValueFactory().setValue(
+                        detalle.getCantidad() != null ? detalle.getCantidad() : 1);
 
                 filas.add(fila);
                 contenedorFilas.getChildren().add(fila.hbox);
@@ -343,23 +384,20 @@ public class CrVentasController implements ModalController {
         if (!validar()) return;
 
         try {
-            // 1. Calculamos el total automático sumando los productos (con IVA del 16%)
-            double totalCalculado = filas.stream().mapToDouble(FilaProducto::getSubtotal).sum() * 1.16;
+            double totalCalculado = filas.stream()
+                    .mapToDouble(FilaProducto::getSubtotal).sum() * 1.16;
 
-            // 2. Sacamos el ID del empleado desde la Bóveda Global (Sesión)
-            int idVendedor = mx.nanosip.nanosip.Controllers.Backend.Sesion.getInstance().getUsuarioActual().getId();
-
-            // 3. Obtenemos el ID del cliente
+            int idVendedor = Sesion.getInstance().getUsuarioActual().getId();
             Integer idCliente = clienteSeleccionado.getId();
 
-            // 💡 USAMOS TU VARIABLE: ventaEditar
+            ProductosAPI apiProductos2 = new ProductosAPI();
+
             if (ventaEditar == null) {
                 // ── CREAR NUEVA VENTA ──
                 Ventas nueva = new Ventas();
-
-                nueva.setIdEmpleado(idVendedor); // ¡ID Automático!
+                nueva.setIdEmpleado(idVendedor);
                 nueva.setIdClientes(idCliente);
-                nueva.setMonto(totalCalculado);  // ¡Total Automático!
+                nueva.setMonto(totalCalculado);
 
                 Ventas ventaGuardada = apiVentas.guardar(nueva);
 
@@ -367,25 +405,49 @@ public class CrVentasController implements ModalController {
                     VentasProductos detalle = new VentasProductos();
                     detalle.setNumeroVenta(ventaGuardada.getNumero());
                     detalle.setClaveProducto(fila.cmbProducto.getValue().getClave());
-                    detalle.setCantidad(Integer.parseInt(fila.txtCantidad.getText().trim()));
+                    detalle.setCantidad(fila.getCantidad());
                     apiVentas.guardarDetalle(detalle);
+
+                    // Descontar inventario
+                    apiProductos2.actualizarInventario(
+                            fila.cmbProducto.getValue().getClave(),
+                            -fila.getCantidad());
                 }
 
             } else {
                 // ── EDITAR VENTA EXISTENTE ──
+
+                // 1. Restaurar stock de los productos originales
+                for (Map.Entry<Integer, Integer> entry : stockOriginal.entrySet()) {
+                    apiProductos2.actualizarInventario(entry.getKey(), entry.getValue());
+                }
+
+                // 2. Eliminar detalles anteriores
+                apiVentas.eliminarDetalles(ventaEditar.getNumero());
+
+                // 3. Actualizar la venta
                 ventaEditar.setIdClientes(idCliente);
                 ventaEditar.setMonto(totalCalculado);
-                // OJO: Por seguridad, no actualizamos el IdEmpleado al editar,
-                // porque la venta original la hizo quien la hizo.
-
-                // 💡 USAMOS TU API Y MÉTODO: apiVentas.actualizar()
                 apiVentas.actualizar(ventaEditar);
+
+                // 4. Guardar nuevos detalles y descontar nuevo inventario
+                for (FilaProducto fila : filas) {
+                    VentasProductos detalle = new VentasProductos();
+                    detalle.setNumeroVenta(ventaEditar.getNumero());
+                    detalle.setClaveProducto(fila.cmbProducto.getValue().getClave());
+                    detalle.setCantidad(fila.getCantidad());
+                    apiVentas.guardarDetalle(detalle);
+
+                    // Descontar inventario nuevo
+                    apiProductos2.actualizarInventario(
+                            fila.cmbProducto.getValue().getClave(),
+                            -fila.getCantidad());
+                }
             }
 
             cerrarModal();
 
         } catch (Exception e) {
-            // 💡 USAMOS TU MÉTODO DE ALERTA: mostrarError()
             mostrarError("Error al registrar venta: " + e.getMessage());
         }
     }
@@ -409,10 +471,8 @@ public class CrVentasController implements ModalController {
             mostrarError("Selecciona el producto en todas las filas.");
             return false;
         }
-        boolean cantidadInvalida = filas.stream().anyMatch(f -> {
-            try { return Integer.parseInt(f.txtCantidad.getText().trim()) <= 0; }
-            catch (NumberFormatException e) { return true; }
-        });
+        boolean cantidadInvalida = filas.stream()
+                .anyMatch(f -> f.getCantidad() <= 0);
         if (cantidadInvalida) {
             mostrarError("Las cantidades deben ser números mayores a 0.");
             return false;
@@ -440,4 +500,26 @@ public class CrVentasController implements ModalController {
 
     @Override
     public void setModalStage(Stage stage) { this.modalStage = stage; }
+
+    private int calcularStockDisponible(Productos producto, FilaProducto filaActual) {
+        // Stock real del producto
+        int stockReal = producto.getInventario();
+
+        // Si estamos editando una venta, sumamos el stock que ya estaba comprometido
+        // por esta venta (para no penalizar dos veces)
+        int yaComprometidoEnEstaVenta = 0;
+        if (ventaEditar != null) {
+            yaComprometidoEnEstaVenta = stockOriginal.getOrDefault(producto.getClave(), 0);
+        }
+
+        // Restamos lo que otras filas de esta misma sesión ya están usando del mismo producto
+        int usadoEnOtrasFilas = filas.stream()
+                .filter(f -> f != filaActual)
+                .filter(f -> f.cmbProducto.getValue() != null)
+                .filter(f -> f.cmbProducto.getValue().getClave().equals(producto.getClave()))
+                .mapToInt(FilaProducto::getCantidad)
+                .sum();
+
+        return Math.max(0, stockReal + yaComprometidoEnEstaVenta - usadoEnOtrasFilas);
+    }
 }

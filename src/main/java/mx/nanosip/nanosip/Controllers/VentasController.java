@@ -223,7 +223,7 @@ public class VentasController extends BaseController {
             return;
         }
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "¿Eliminar a " + seleccionado.getNumero() + "?",
+                "¿Eliminar la venta #" + seleccionado.getNumero() + "?",
                 ButtonType.YES, ButtonType.NO);
         confirm.setTitle("Confirmar");
         confirm.setHeaderText(null);
@@ -237,8 +237,24 @@ public class VentasController extends BaseController {
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
                 try {
+                    VentasProductosAPI detallesApi = new VentasProductosAPI();
+                    ProductosAPI productosApi = new ProductosAPI();
+
+                    // 1. Obtener detalles antes de eliminar para restaurar stock
+                    List<VentasProductos> detalles =
+                            detallesApi.obtenerPorVenta(seleccionado.getNumero());
+
+                    // 2. Restaurar inventario
+                    for (VentasProductos d : detalles) {
+                        productosApi.actualizarInventario(
+                                d.getClaveProducto(),
+                                d.getCantidad() != null ? d.getCantidad() : 0);
+                    }
+
+                    // 3. Eliminar la venta
                     api.eliminar(seleccionado.getNumero());
                     cargarDatos();
+
                 } catch (Exception e) {
                     mostrarAlerta("Error al eliminar: " + e.getMessage());
                 }

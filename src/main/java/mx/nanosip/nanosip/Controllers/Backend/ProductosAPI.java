@@ -92,11 +92,15 @@ public class ProductosAPI {
 
     public void eliminarProveedoresDeProducto(int claveProducto) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/productos-proveedores/" + claveProducto))
+                .uri(URI.create("http://localhost:8080/api/productos-proveedores/producto/" + claveProducto))
                 .DELETE()
                 .build();
 
-        client.send(req, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200 && res.statusCode() != 204) {
+            throw new RuntimeException("Error al eliminar proveedores: " + res.body());
+        }
     }
 
     public List<Integer> obtenerIdsProveedoresPorProducto(int claveProducto) throws Exception {
@@ -124,5 +128,17 @@ public class ProductosAPI {
         return relaciones.stream()
                 .map(ProductosProveedores::getIdProveedor)
                 .toList();
+    }
+    public void actualizarInventario(int claveProducto, int cantidad) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE + "/" + claveProducto + "/inventario?cantidad=" + cantidad))
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        if (res.statusCode() != 200) {
+            throw new RuntimeException("Error al actualizar inventario: " + res.body());
+        }
     }
 }
