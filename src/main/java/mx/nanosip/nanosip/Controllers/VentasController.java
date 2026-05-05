@@ -11,6 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import mx.nanosip.nanosip.App;
 import mx.nanosip.nanosip.Controllers.Backend.Ventas;
 import mx.nanosip.nanosip.Controllers.Backend.VentasAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrVentasController;
@@ -27,6 +29,8 @@ import mx.nanosip.nanosip.Controllers.Backend.VentasProductos;
 import mx.nanosip.nanosip.Controllers.Backend.VentasProductosAPI;
 import mx.nanosip.nanosip.Controllers.Backend.ProductosAPI;
 import mx.nanosip.nanosip.Controllers.Backend.Productos;
+import mx.nanosip.nanosip.WindowDragUtil;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -190,20 +194,24 @@ public class VentasController extends BaseController {
 
     @FXML public void editar() {
         Ventas seleccionado = tablaVentas.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarAlerta("Selecciona una venta primero.");
-            return;
-        }
+        if (seleccionado == null) { mostrarAlerta("Selecciona una venta primero."); return; }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/CrVentas.fxml"));
             Parent root = loader.load();
-
-            CrVentasController modal=loader.getController();
+            CrVentasController modal = loader.getController();
             modal.setVenta(seleccionado);
 
             Stage stage = new Stage();
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initOwner(App.getStage());
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
             modal.setModalStage(stage);
-            stage.setScene(new Scene(root));
+
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) WindowDragUtil.enable(topbarNode, stage);
+
             stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {

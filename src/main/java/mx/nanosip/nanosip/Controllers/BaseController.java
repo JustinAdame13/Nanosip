@@ -79,12 +79,12 @@ public abstract class BaseController {
     //  Ventana
     // ─────────────────────────────────────────────────────────
     @FXML public void minimizar() {
-        Stage stage = App.getStage();
+        Stage stage = (Stage) topbar.getScene().getWindow();
         if (stage != null) stage.setIconified(true);
     }
 
     @FXML public void cerrar() {
-        Stage stage = App.getStage();
+        Stage stage = (Stage) topbar.getScene().getWindow();
         if (stage != null) stage.close();
     }
 

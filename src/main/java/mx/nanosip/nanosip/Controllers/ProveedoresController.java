@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import javafx.stage.StageStyle;
+import mx.nanosip.nanosip.App;
 import mx.nanosip.nanosip.Controllers.Backend.ProveedoresAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrProveedoresController;
 
@@ -19,6 +21,7 @@ import mx.nanosip.nanosip.Controllers.Modals.CrProveedoresController;
 import mx.nanosip.nanosip.Controllers.Backend.Empleados;
 import mx.nanosip.nanosip.Controllers.Backend.Proveedores;
 import mx.nanosip.nanosip.Controllers.Backend.Sesion;
+import mx.nanosip.nanosip.WindowDragUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -141,14 +144,22 @@ public class ProveedoresController extends BaseController {
                     getClass().getResource("/mx/nanosip/nanosip/CrProveedores.fxml"));
             Parent root = loader.load();
             CrProveedoresController modal = loader.getController();
+
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            modal.setModalStage(stage); // Enlazamos la ventana para poder cerrarla
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initOwner(App.getStage());
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
+            modal.setModalStage(stage);
+
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) WindowDragUtil.enable(topbarNode, stage);
+
             stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {
             System.err.println("Error abriendo CrProveedores: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -156,28 +167,28 @@ public class ProveedoresController extends BaseController {
 
     @FXML public void editar() {
         Proveedores seleccionado = tablaProveedores.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarAlerta("Selecciona un proveedor primero.");
-            return;
-        }
+        if (seleccionado == null) { mostrarAlerta("Selecciona un proveedor primero."); return; }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/CrProveedores.fxml"));
             Parent root = loader.load();
-
             CrProveedoresController modal = loader.getController();
 
             Stage stage = new Stage();
-            modal.setModalStage(stage); // Enlazamos la ventana
-
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initOwner(App.getStage());
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
+            modal.setModalStage(stage);
             modal.setProveedor(seleccionado);
 
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) WindowDragUtil.enable(topbarNode, stage);
 
+            stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {
             System.err.println("Error abriendo modal: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

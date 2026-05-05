@@ -12,10 +12,13 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 // 💡 Asegúrate de que las rutas a tu modelo Empleado y Sesion sean las correctas
+import javafx.stage.StageStyle;
+import mx.nanosip.nanosip.App;
 import mx.nanosip.nanosip.Controllers.Backend.Empleados;
 import mx.nanosip.nanosip.Controllers.Backend.EmpleadosAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrEmpleadosController;
 import mx.nanosip.nanosip.Controllers.Backend.Sesion;
+import mx.nanosip.nanosip.WindowDragUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -148,27 +151,26 @@ public class EmpleadosController extends BaseController {
 
     @FXML public void editar() {
         Empleados seleccionado = tablaEmpleados.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarAlerta("Selecciona un empleado primero.");
-            return;
-        }
-
+        if (seleccionado == null) { mostrarAlerta("Selecciona un empleado primero."); return; }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/CrEmpleados.fxml"));
             Parent root = loader.load();
-
             CrEmpleadosController modal = loader.getController();
             modal.setEmpleado(seleccionado);
 
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-
-            // 💡 CRÍTICO: Le decimos al modal en qué ventana está para que pueda cerrarse
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initOwner(App.getStage());
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
             modal.setModalStage(stage);
 
-            stage.showAndWait();
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) WindowDragUtil.enable(topbarNode, stage);
 
-            cargarDatos(); // refresca la tabla después de cerrar el modal
+            stage.showAndWait();
+            cargarDatos();
         } catch (IOException e) {
             System.err.println("Error abriendo modal: " + e.getMessage());
         }

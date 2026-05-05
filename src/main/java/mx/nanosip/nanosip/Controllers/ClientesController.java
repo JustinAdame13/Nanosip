@@ -11,6 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import mx.nanosip.nanosip.App;
 import mx.nanosip.nanosip.Controllers.Backend.Clientes;
 import mx.nanosip.nanosip.Controllers.Backend.ClientesAPI;
 import mx.nanosip.nanosip.Controllers.Modals.CrClientesController;
@@ -18,6 +20,7 @@ import mx.nanosip.nanosip.Controllers.Modals.CrClientesController;
 // 💡 Importamos los modelos para la sesión global
 import mx.nanosip.nanosip.Controllers.Backend.Empleados;
 import mx.nanosip.nanosip.Controllers.Backend.Sesion;
+import mx.nanosip.nanosip.WindowDragUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -138,14 +141,22 @@ public class ClientesController extends BaseController {
                     getClass().getResource("/mx/nanosip/nanosip/CrClientes.fxml"));
             Parent root = loader.load();
             CrClientesController modal = loader.getController();
+
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initOwner(App.getStage());
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
             modal.setModalStage(stage);
+
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) WindowDragUtil.enable(topbarNode, stage);
+
             stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {
             System.err.println("Error abriendo CrClientes: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -159,15 +170,23 @@ public class ClientesController extends BaseController {
                     getClass().getResource("/mx/nanosip/nanosip/CrClientes.fxml"));
             Parent root = loader.load();
             CrClientesController modal = loader.getController();
+
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initOwner(App.getStage());
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            stage.setScene(scene);
             modal.setModalStage(stage);
             modal.setCliente(seleccionado);
+
+            javafx.scene.Node topbarNode = root.lookup("#topbar");
+            if (topbarNode != null) WindowDragUtil.enable(topbarNode, stage);
+
             stage.showAndWait();
             cargarDatos();
         } catch (IOException e) {
             System.err.println("Error abriendo CrClientes: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

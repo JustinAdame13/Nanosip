@@ -215,6 +215,9 @@ public class CrVentasController implements ModalController {
                     txtBuscarCliente.getBoundsInLocal()
             );
 
+            // Si el nodo aún no está en pantalla, no mostramos el popup
+            if (bounds == null) return;
+
             if (!popupClientes.isShowing()) {
                 popupClientes.show(
                         txtBuscarCliente,
@@ -222,7 +225,6 @@ public class CrVentasController implements ModalController {
                         bounds.getMaxY() + 2
                 );
             } else {
-                // Ya estaba abierto, solo actualizamos posición
                 popupClientes.setX(bounds.getMinX());
                 popupClientes.setY(bounds.getMaxY() + 2);
             }
