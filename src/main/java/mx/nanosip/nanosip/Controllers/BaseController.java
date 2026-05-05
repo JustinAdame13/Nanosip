@@ -5,6 +5,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -27,6 +28,8 @@ public abstract class BaseController {
     @FXML protected StackPane dockWrapper;
     @FXML protected HBox      dockBar;
     @FXML protected HBox      topbar;
+
+    @FXML protected Button btnMaximizar;
 
     private static final double DOCK_FULL        = 56.0;
     private static final double DOCK_HIDDEN      = 8.0;
@@ -81,6 +84,14 @@ public abstract class BaseController {
     @FXML public void minimizar() {
         Stage stage = (Stage) topbar.getScene().getWindow();
         if (stage != null) stage.setIconified(true);
+    }
+    @FXML public void maximizar() {
+        Stage stage = (Stage) topbar.getScene().getWindow();
+        if (stage != null) {
+            boolean maximizado = stage.isMaximized();
+            stage.setMaximized(!maximizado);
+            btnMaximizar.setText(maximizado ? "▢" : "❐");
+        }
     }
 
     @FXML public void cerrar() {
@@ -147,9 +158,13 @@ public abstract class BaseController {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/mx/nanosip/nanosip/" + fxml));
             javafx.scene.Parent root = loader.load();
-
-            // Usamos la variable topbar (que ya tienes en tus FXML) para cambiar la escena
+            Stage stage = (Stage) topbar.getScene().getWindow();
             topbar.getScene().setRoot(root);
+
+            javafx.scene.Node nuevoTopbar = root.lookup("#topbar");
+            if (nuevoTopbar != null) {
+                mx.nanosip.nanosip.WindowDragUtil.enable(nuevoTopbar, stage);
+            }
         } catch (Exception e) {
             System.err.println("❌ Error al cambiar a: " + fxml);
             e.printStackTrace();

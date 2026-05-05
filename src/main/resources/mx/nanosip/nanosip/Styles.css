@@ -102,6 +102,10 @@
     -fx-background-color: #8D86C9;
     -fx-text-fill: #242038;
 }
+.wmbtn-max {
+    -fx-background-color: #725AC1;
+    -fx-text-fill: #CAC4CE;
+}
 .wmbtn-close {
     -fx-background-color: #4B3A8C;
     -fx-text-fill: #CAC4CE;

@@ -77,9 +77,17 @@ public class MainController {
 
             // 3. Reemplazamos el menú con la pantalla del módulo directamente
             stage.getScene().setRoot(root);
+            stage.sizeToScene();
+            stage.centerOnScreen();
+
+            // Registrar arrastre en el nuevo topbar
+            javafx.scene.Node nuevoTopbar = root.lookup("#topbar");
+            if (nuevoTopbar != null) {
+                mx.nanosip.nanosip.WindowDragUtil.enable(nuevoTopbar, stage);
+            }
 
             // 4. Maximizamos para que ocupe todo el monitor
-            stage.setMaximized(true);
+
 
         } catch (Exception e) {
             System.err.println("❌ Error al abrir el módulo: " + fxml);

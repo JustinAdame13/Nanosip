@@ -36,6 +36,7 @@
 
             <!-- Minimizar / Cerrar -->
             <Button fx:id="btnMinimizar" onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─" />
+            <Button fx:id="btnMaximizar" onAction="#maximizar" styleClass="wmbtn, wmbtn-max" text="▢" />
             <Button fx:id="btnCerrar" onAction="#cerrar" styleClass="wmbtn, wmbtn-close" text="✕" />
         </HBox>
     </top>
