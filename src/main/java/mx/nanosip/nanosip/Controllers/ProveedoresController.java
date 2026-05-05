@@ -163,7 +163,10 @@ public class ProveedoresController extends BaseController {
         }
     }
 
-    @FXML public void generarReporte() {}
+    @FXML public void generarReporte() {
+        Stage owner = (Stage) topbar.getScene().getWindow();
+        ReporteHelper.generarProveedores(owner);
+    } {}
 
     @FXML public void editar() {
         Proveedores seleccionado = tablaProveedores.getSelectionModel().getSelectedItem();

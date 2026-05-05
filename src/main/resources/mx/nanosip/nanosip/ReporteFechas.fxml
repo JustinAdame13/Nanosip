@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane prefHeight="240.0" prefWidth="360.0"
+            stylesheets="@Styles.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.nanosip.nanosip.Controllers.Modals.ReporteFechasController"
+            styleClass="root-pane">
+
+    <top>
+        <HBox fx:id="topbar" alignment="CENTER_LEFT" prefHeight="46.0"
+              spacing="8" styleClass="topbar">
+            <padding><Insets bottom="8" left="16" right="8" top="8"/></padding>
+            <Label styleClass="topbar-title" text="Rango de Fechas — Reporte"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#cancelar" styleClass="wmbtn, wmbtn-close" text="✕"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox alignment="TOP_LEFT" spacing="16" styleClass="login-card">
+            <padding><Insets bottom="28" left="32" right="32" top="24"/></padding>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Fecha de inicio"/>
+                <DatePicker fx:id="dpInicio" styleClass="login-field"
+                            maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Fecha de fin"/>
+                <DatePicker fx:id="dpFin" styleClass="login-field"
+                            maxWidth="Infinity"/>
+            </VBox>
+
+            <Label fx:id="lblError" styleClass="field-error" text=""
+                   visible="false" managed="false"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <HBox spacing="10">
+                <Button onAction="#cancelar" text="Cancelar"
+                        styleClass="login-btn" maxWidth="Infinity"
+                        HBox.hgrow="ALWAYS"
+                        style="-fx-background-color: #4B3A8C;"/>
+                <Button onAction="#confirmar" text="Generar Reporte"
+                        styleClass="login-btn" maxWidth="Infinity"
+                        HBox.hgrow="ALWAYS"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>

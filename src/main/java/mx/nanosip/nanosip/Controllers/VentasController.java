@@ -184,7 +184,10 @@ public class VentasController extends BaseController {
         cargarDatos();
     }
 
-    @FXML public void generarReporte() {}
+    @FXML public void generarReporte() {
+        Stage owner = (Stage) topbar.getScene().getWindow();
+        ReporteHelper.generarVentas(owner);
+    }
 
     @FXML public void editar() {
         Ventas seleccionado = tablaVentas.getSelectionModel().getSelectedItem();

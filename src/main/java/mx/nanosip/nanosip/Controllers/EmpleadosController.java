@@ -147,6 +147,8 @@ public class EmpleadosController extends BaseController {
     }
 
     @FXML public void generarReporte() {
+        Stage owner = (Stage) topbar.getScene().getWindow();
+        ReporteHelper.generarEmpleados(owner);
     }
 
     @FXML public void editar() {

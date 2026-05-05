@@ -160,7 +160,10 @@ public class ClientesController extends BaseController {
         }
     }
 
-    @FXML public void generarReporte() {}
+    @FXML public void generarReporte() {
+        Stage owner = (Stage) topbar.getScene().getWindow();
+        ReporteHelper.generarClientes(owner);
+    }
 
     @FXML public void editar() {
         Clientes seleccionado = tablaClientes.getSelectionModel().getSelectedItem();
