@@ -361,9 +361,6 @@ public class CrVentasController implements ModalController {
                 nueva.setIdClientes(idCliente);
                 nueva.setMonto(totalCalculado);  // ¡Total Automático!
 
-                // 💡 USAMOS TU API Y MÉTODO: apiVentas.guardar()
-                apiVentas.guardar(nueva);
-                // Guardar cada producto de la venta
                 Ventas ventaGuardada = apiVentas.guardar(nueva);
 
                 for (FilaProducto fila : filas) {

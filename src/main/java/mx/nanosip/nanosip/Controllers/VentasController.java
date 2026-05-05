@@ -117,49 +117,43 @@ public class VentasController extends BaseController {
         colEmpleado.setCellValueFactory(new PropertyValueFactory<>("idEmpleado"));
         colCliente .setCellValueFactory(new PropertyValueFactory<>("idClientes"));
         colMonto   .setCellValueFactory(new PropertyValueFactory<>("monto"));
-
-        // Columna de productos — nombres separados por comas
-        colProducto.setCellValueFactory(cellData -> {
-            Ventas venta = cellData.getValue();
-            try {
-                VentasProductosAPI detallesApi = new VentasProductosAPI();
-                List<VentasProductos> detalles = detallesApi.obtenerPorVenta(venta.getNumero());
-                List<Productos> catalogo = ProductosAPI.obtenerTodos();
-
-                String nombres = detalles.stream()
-                        .map(d -> catalogo.stream()
-                                .filter(p -> p.getClave().equals(d.getClaveProducto()))
-                                .map(Productos::getNombre)
-                                .findFirst()
-                                .orElse("ID:" + d.getClaveProducto()))
-                        .collect(Collectors.joining(", "));
-
-                return new javafx.beans.property.SimpleStringProperty(nombres);
-            } catch (Exception e) {
-                return new javafx.beans.property.SimpleStringProperty("—");
-            }
-        });
-
-        // Columna de cantidad total
-        colCantidad.setCellValueFactory(cellData -> {
-            Ventas venta = cellData.getValue();
-            try {
-                VentasProductosAPI detallesApi = new VentasProductosAPI();
-                List<VentasProductos> detalles = detallesApi.obtenerPorVenta(venta.getNumero());
-                int total = detalles.stream()
-                        .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
-                        .sum();
-                return new javafx.beans.property.SimpleStringProperty(String.valueOf(total));
-            } catch (Exception e) {
-                return new javafx.beans.property.SimpleStringProperty("0");
-            }
-        });
+        colProducto.setCellValueFactory(new PropertyValueFactory<>("productos"));
+        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidadTotal"));
     }
 
     private void cargarDatos() {
         listaCompleta.clear();
         try {
             List<Ventas> lista = api.obtenerTodos();
+            List<Productos> catalogo = ProductosAPI.obtenerTodos();
+            VentasProductosAPI detallesApi = new VentasProductosAPI();
+
+            for (Ventas venta : lista) {
+                try {
+                    List<VentasProductos> detalles = detallesApi.obtenerPorVenta(venta.getNumero());
+
+                    // Nombres de productos separados por coma
+                    String nombres = detalles.stream()
+                            .map(d -> catalogo.stream()
+                                    .filter(p -> p.getClave().equals(d.getClaveProducto()))
+                                    .map(Productos::getNombre)
+                                    .findFirst()
+                                    .orElse("ID:" + d.getClaveProducto()))
+                            .collect(Collectors.joining(", "));
+
+                    // Cantidad total
+                    int total = detalles.stream()
+                            .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
+                            .sum();
+
+                    venta.setProductos(nombres);
+                    venta.setCantidadTotal(total);
+                } catch (Exception e) {
+                    venta.setProductos("—");
+                    venta.setCantidadTotal(0);
+                }
+            }
+
             listaCompleta.addAll(lista);
         } catch (Exception e) {
             System.err.println("Error cargando ventas: " + e.getMessage());
