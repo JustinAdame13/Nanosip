@@ -169,7 +169,10 @@ public class ProductosController extends BaseController {
         }
     }
 
-    @FXML public void generarReporte() {}
+    @FXML public void generarReporte() {
+        Stage owner = (Stage) topbar.getScene().getWindow();
+        ReporteHelper.generarProductos(owner);
+    }
 
     @FXML public void editar() {
         Productos seleccionado = tablaProductos.getSelectionModel().getSelectedItem();
