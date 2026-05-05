@@ -11,98 +11,79 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="620.0" prefWidth="400.0"
-            stylesheets="@Styles.css"
-            xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mx.nanosip.nanosip.Controllers.Modals.CrProductosController"
-            styleClass="root-pane">
+<BorderPane prefHeight="620.0" prefWidth="400.0" styleClass="root-pane" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.Modals.CrProductosController">
 
     <!-- TOP BAR -->
     <top>
         <HBox fx:id="topbar" alignment="CENTER_LEFT" prefHeight="46.0" spacing="8" styleClass="topbar">
-            <padding><Insets bottom="8" left="16" right="8" top="8"/></padding>
-            <Label fx:id="lblTitulo" styleClass="topbar-title" text="Nuevo Producto"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─"/>
-            <Button onAction="#cerrarModal" styleClass="wmbtn, wmbtn-close" text="✕"/>
+            <padding><Insets bottom="8" left="16" right="8" top="8" /></padding>
+            <Label fx:id="lblTitulo" styleClass="topbar-title" text="Nuevo Producto" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─" />
+            <Button onAction="#cerrarModal" styleClass="wmbtn, wmbtn-close" text="✕" />
         </HBox>
     </top>
 
     <!-- FORMULARIO -->
     <center>
-        <VBox alignment="TOP_LEFT" spacing="12" styleClass="login-card">
-            <padding><Insets bottom="28" left="32" right="32" top="20"/></padding>
+        <VBox alignment="TOP_LEFT" prefHeight="609.0" prefWidth="400.0" spacing="12" styleClass="login-card">
+            <padding><Insets bottom="28" left="32" right="32" top="20" /></padding>
 
             <!-- Clave (solo lectura) -->
             <VBox spacing="4">
-                <Label styleClass="form-label" text="Clave"/>
-                <TextField fx:id="txtClave" promptText="Asignada automáticamente"
-                           styleClass="login-field" editable="false" opacity="0.6"/>
+                <Label styleClass="form-label" text="Clave" />
+                <TextField fx:id="txtClave" editable="false" opacity="0.6" promptText="Asignada automáticamente" styleClass="login-field" />
             </VBox>
 
             <!-- Nombre -->
             <VBox spacing="4">
-                <Label styleClass="form-label" text="Nombre"/>
-                <TextField fx:id="txtNombre" promptText="Nombre del producto"
-                           styleClass="login-field"/>
+                <Label styleClass="form-label" text="Nombre" />
+                <TextField fx:id="txtNombre" promptText="Nombre del producto" styleClass="login-field" />
             </VBox>
 
             <!-- Descripción -->
             <VBox spacing="4">
-                <Label styleClass="form-label" text="Descripción"/>
-                <TextField fx:id="txtDescripcion" promptText="Descripción"
-                           styleClass="login-field"/>
+                <Label styleClass="form-label" text="Descripción" />
+                <TextField fx:id="txtDescripcion" promptText="Descripción" styleClass="login-field" />
             </VBox>
 
             <!-- Marca y Existencia en la misma fila -->
             <HBox spacing="12">
                 <VBox spacing="4" HBox.hgrow="ALWAYS">
-                    <Label styleClass="form-label" text="Marca"/>
-                    <TextField fx:id="txtMarca" promptText="Marca"
-                               styleClass="login-field"/>
+                    <Label styleClass="form-label" text="Marca" />
+                    <TextField fx:id="txtMarca" promptText="Marca" styleClass="login-field" />
                 </VBox>
                 <VBox spacing="4">
-                    <Label styleClass="form-label" text="Existencia"/>
-                    <Spinner fx:id="spnExistencia" min="0" max="999999"
-                             initialValue="0" editable="true"
-                             prefWidth="110" styleClass="modal-spinner"/>
+                    <Label styleClass="form-label" text="Existencia" />
+                    <Spinner fx:id="spnExistencia" editable="true" initialValue="0" max="999999" min="0" prefWidth="110" styleClass="modal-spinner" />
                 </VBox>
             </HBox>
 
             <!-- Precio y Costo en la misma fila -->
             <HBox spacing="12">
                 <VBox spacing="4" HBox.hgrow="ALWAYS">
-                    <Label styleClass="form-label" text="Precio"/>
-                    <TextField fx:id="txtPrecio" promptText="0.00"
-                               styleClass="login-field"/>
+                    <Label styleClass="form-label" text="Precio" />
+                    <TextField fx:id="txtPrecio" promptText="0.00" styleClass="login-field" />
                 </VBox>
                 <VBox spacing="4" HBox.hgrow="ALWAYS">
-                    <Label styleClass="form-label" text="Costo"/>
-                    <TextField fx:id="txtCosto" promptText="0.00"
-                               styleClass="login-field"/>
+                    <Label styleClass="form-label" text="Costo" />
+                    <TextField fx:id="txtCosto" promptText="0.00" styleClass="login-field" />
                 </VBox>
             </HBox>
 
             <!-- Proveedores -->
             <VBox spacing="6">
-                <Label styleClass="form-label" text="Proveedores"/>
+                <Label styleClass="form-label" text="Proveedores" />
                 <!-- Búsqueda -->
-                <TextField fx:id="txtBuscarProveedor"
-                           promptText="🔍  Buscar proveedor…"
-                           styleClass="login-field"/>
+                <TextField fx:id="txtBuscarProveedor" promptText="🔍  Buscar proveedor…" styleClass="login-field" />
                 <!-- Lista con checkboxes -->
-                <ListView fx:id="listaProveedores"
-                          prefHeight="110"
-                          styleClass="provider-list"/>
+                <ListView fx:id="listaProveedores" minHeight="60.0" prefHeight="110.0" styleClass="provider-list" />
             </VBox>
 
-            <Region VBox.vgrow="ALWAYS"/>
+            <Region VBox.vgrow="ALWAYS" />
 
             <!-- Botón guardar -->
-            <Button fx:id="btnGuardar" onAction="#guardar"
-                    text="Guardar" styleClass="login-btn"
-                    maxWidth="Infinity"/>
+            <Button fx:id="btnGuardar" maxWidth="Infinity" onAction="#guardar" styleClass="login-btn" text="Guardar" />
         </VBox>
     </center>
 
