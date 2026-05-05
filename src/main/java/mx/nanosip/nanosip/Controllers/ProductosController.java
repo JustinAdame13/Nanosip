@@ -205,8 +205,16 @@ public class ProductosController extends BaseController {
             return;
         }
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "¿Eliminar el producto " + seleccionado.getNombre() + "?",
+                "¿Eliminar a " + seleccionado.getNombre() + "?",
                 ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirmar");
+        confirm.setHeaderText(null);
+
+        DialogPane dp = confirm.getDialogPane();
+        dp.getStylesheets().add(
+                getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+        );
+        dp.getStyleClass().add("alert-pane");
 
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
@@ -222,8 +230,16 @@ public class ProductosController extends BaseController {
 
     private void mostrarAlerta(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Aviso");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
+
+        DialogPane dp = alert.getDialogPane();
+        dp.getStylesheets().add(
+                getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+        );
+        dp.getStyleClass().add("alert-pane");
+
         alert.showAndWait();
     }
     @FXML

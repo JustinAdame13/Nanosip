@@ -275,11 +275,19 @@ public class CrEmpleadosController implements ModalController {
         eliminar.setSelected(nivel >= 4);
     }
 
-    private void mostrarAlerta(String msg) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
+    private void mostrarAlerta(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Aviso");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        DialogPane dp = alert.getDialogPane();
+        dp.getStylesheets().add(
+                getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+        );
+        dp.getStyleClass().add("alert-pane");
+
+        alert.showAndWait();
     }
 
 }

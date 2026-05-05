@@ -717,3 +717,38 @@
    .scroll-bar .decrement-arrow {
        -fx-background-color: #8D86C9;
    }
+   /* ══════════════════════════════════════════
+      ALERTAS
+      ══════════════════════════════════════════ */
+   .alert-pane {
+       -fx-background-color: #F5F3FA;
+       -fx-border-color: #725AC1;
+       -fx-border-width: 1.5;
+       /*-fx-border-radius: 8;
+       -fx-background-radius: 8; */
+   }
+
+   .alert-pane .content.label {
+       -fx-text-fill: #242038;
+       -fx-font-family: "Segoe UI", sans-serif;
+       -fx-font-size: 13px;
+   }
+
+   .alert-pane .button-bar .button {
+       -fx-background-color: #725AC1;
+       -fx-text-fill: #FFFFFF;
+       -fx-background-radius: 8;
+       -fx-border-width: 0;
+       -fx-font-family: "Segoe UI Semibold", sans-serif;
+       -fx-font-size: 12px;
+       -fx-padding: 6 20 6 20;
+       -fx-cursor: hand;
+   }
+
+   .alert-pane .button-bar .button:hover {
+       -fx-background-color: #8D86C9;
+   }
+
+   .alert-pane .button-bar .button:pressed {
+       -fx-background-color: #5C4799;
+   }

@@ -48,20 +48,30 @@ public class CrProveedoresController implements ModalController {
             }
             cerrarModal();
         } catch (Exception e) {
-            alerta("Error al guardar: " + e.getMessage());
+            mostrarAlerta("Error al guardar: " + e.getMessage());
         }
     }
 
     private boolean validar() {
-        if (txtNombre.getText().isBlank())   { alerta("El nombre es obligatorio.");   return false; }
-        if (txtRFC.getText().isBlank())      { alerta("El RFC es obligatorio.");      return false; }
-        if (txtTelefono.getText().isBlank()) { alerta("El teléfono es obligatorio."); return false; }
+        if (txtNombre.getText().isBlank())   { mostrarAlerta("El nombre es obligatorio.");   return false; }
+        if (txtRFC.getText().isBlank())      { mostrarAlerta("El RFC es obligatorio.");      return false; }
+        if (txtTelefono.getText().isBlank()) { mostrarAlerta("El teléfono es obligatorio."); return false; }
         return true;
     }
 
-    private void alerta(String msg) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
+    private void mostrarAlerta(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Aviso");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        DialogPane dp = alert.getDialogPane();
+        dp.getStylesheets().add(
+                getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+        );
+        dp.getStyleClass().add("alert-pane");
+
+        alert.showAndWait();
     }
 
     @FXML public void cerrarModal() { if (modalStage != null) modalStage.close(); }

@@ -424,10 +424,18 @@ public class CrVentasController implements ModalController {
     }
 
     private void mostrarError(String msg) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Aviso");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+
+        DialogPane dp = alert.getDialogPane();
+        dp.getStylesheets().add(
+                getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+        );
+        dp.getStyleClass().add("alert-pane");
+
+        alert.showAndWait();
     }
 
     @FXML public void cerrarModal() { if (modalStage != null) modalStage.close(); }

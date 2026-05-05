@@ -161,21 +161,31 @@ public class CrProductosController implements ModalController {
 
             cerrarModal();
         } catch (Exception e) {
-            alerta("Error al guardar: " + e.getMessage());
+            mostrarAlerta("Error al guardar: " + e.getMessage());
         }
     }
 
     private boolean validar() {
-        if (txtNombre.getText().isBlank()) { alerta("El nombre es obligatorio."); return false; }
-        if (txtMarca.getText().isBlank())  { alerta("La marca es obligatoria.");  return false; }
-        if (txtPrecio.getText().isBlank()) { alerta("El precio es obligatorio."); return false; }
-        if (txtCosto.getText().isBlank())  { alerta("El costo es obligatorio.");  return false; }
+        if (txtNombre.getText().isBlank()) { mostrarAlerta("El nombre es obligatorio."); return false; }
+        if (txtMarca.getText().isBlank())  { mostrarAlerta("La marca es obligatoria.");  return false; }
+        if (txtPrecio.getText().isBlank()) { mostrarAlerta("El precio es obligatorio."); return false; }
+        if (txtCosto.getText().isBlank())  { mostrarAlerta("El costo es obligatorio.");  return false; }
         return true;
     }
 
-    private void alerta(String msg) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
+    private void mostrarAlerta(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Aviso");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        DialogPane dp = alert.getDialogPane();
+        dp.getStylesheets().add(
+                getClass().getResource("/mx/nanosip/nanosip/Styles.css").toExternalForm()
+        );
+        dp.getStyleClass().add("alert-pane");
+
+        alert.showAndWait();
     }
 
     @FXML public void cerrarModal() { if (modalStage != null) modalStage.close(); }
