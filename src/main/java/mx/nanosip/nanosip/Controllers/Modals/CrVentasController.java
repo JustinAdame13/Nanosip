@@ -248,6 +248,11 @@ public class CrVentasController implements ModalController {
         lblClienteSeleccionado.setText("✓ " + c.getNombre() + "  —  RFC: " + c.getRfc());
         lblClienteSeleccionado.setVisible(true);
         lblClienteSeleccionado.setManaged(true);
+
+        // Solo mostramos el popup si el nodo ya está en pantalla
+        if (popupClientes != null && popupClientes.isShowing()) {
+            popupClientes.hide();
+        }
     }
 
     // ─────────────────────────────────────────────────────────
@@ -291,11 +296,41 @@ public class CrVentasController implements ModalController {
         txtNumVenta.setText(String.valueOf(v.getNumero()));
         txtIdEmpleado.setText(String.valueOf(v.getIdEmpleado()));
 
-        // Preseleccionar cliente
+        // Preseleccionar cliente sin activar el popup
         todosClientes.stream()
                 .filter(c -> c.getId().equals(v.getIdClientes()))
                 .findFirst()
                 .ifPresent(this::seleccionarCliente);
+
+        // Limpiar la fila vacía inicial
+        filas.clear();
+        contenedorFilas.getChildren().clear();
+
+        // Cargar los productos y cantidades reales de la venta
+        try {
+            List<VentasProductos> detalles = apiVentas.obtenerDetalles(v.getNumero());
+
+            for (VentasProductos detalle : detalles) {
+                FilaProducto fila = new FilaProducto(todosProductos);
+
+                // Buscar y seleccionar el producto correcto en el ComboBox
+                todosProductos.stream()
+                        .filter(p -> p.getClave().equals(detalle.getClaveProducto()))
+                        .findFirst()
+                        .ifPresent(fila.cmbProducto::setValue);
+
+                // Poner la cantidad
+                fila.txtCantidad.setText(String.valueOf(detalle.getCantidad()));
+
+                filas.add(fila);
+                contenedorFilas.getChildren().add(fila.hbox);
+            }
+
+            recalcularTotales();
+
+        } catch (Exception e) {
+            System.err.println("Error cargando detalles de venta: " + e.getMessage());
+        }
     }
 
     // ─────────────────────────────────────────────────────────
