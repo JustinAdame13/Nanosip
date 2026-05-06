@@ -401,17 +401,29 @@ public class CrVentasController implements ModalController {
 
                 Ventas ventaGuardada = apiVentas.guardar(nueva);
 
+                Map<Integer, Integer> acumulado = new HashMap<>();
+
+// Agrupar productos repetidos
                 for (FilaProducto fila : filas) {
+                    int clave = fila.cmbProducto.getValue().getClave();
+                    int cantidad = fila.getCantidad();
+
+                    acumulado.merge(clave, cantidad, Integer::sum);
+                }
+
+// Guardar ya agrupado
+                for (Map.Entry<Integer, Integer> entry : acumulado.entrySet()) {
                     VentasProductos detalle = new VentasProductos();
                     detalle.setNumeroVenta(ventaGuardada.getNumero());
-                    detalle.setClaveProducto(fila.cmbProducto.getValue().getClave());
-                    detalle.setCantidad(fila.getCantidad());
+                    detalle.setClaveProducto(entry.getKey());
+                    detalle.setCantidad(entry.getValue());
+
                     apiVentas.guardarDetalle(detalle);
 
-                    // Descontar inventario
                     apiProductos2.actualizarInventario(
-                            fila.cmbProducto.getValue().getClave(),
-                            -fila.getCantidad());
+                            entry.getKey(),
+                            -entry.getValue()
+                    );
                 }
 
             } else {
@@ -430,18 +442,30 @@ public class CrVentasController implements ModalController {
                 ventaEditar.setMonto(totalCalculado);
                 apiVentas.actualizar(ventaEditar);
 
-                // 4. Guardar nuevos detalles y descontar nuevo inventario
+                Map<Integer, Integer> acumulado = new HashMap<>();
+
+                // 1. Agrupar productos repetidos
                 for (FilaProducto fila : filas) {
+                    int clave = fila.cmbProducto.getValue().getClave();
+                    int cantidad = fila.getCantidad();
+
+                    acumulado.merge(clave, cantidad, Integer::sum);
+                }
+
+                // 2. Guardar ya agrupado
+                for (Map.Entry<Integer, Integer> entry : acumulado.entrySet()) {
                     VentasProductos detalle = new VentasProductos();
                     detalle.setNumeroVenta(ventaEditar.getNumero());
-                    detalle.setClaveProducto(fila.cmbProducto.getValue().getClave());
-                    detalle.setCantidad(fila.getCantidad());
+                    detalle.setClaveProducto(entry.getKey());
+                    detalle.setCantidad(entry.getValue());
+
                     apiVentas.guardarDetalle(detalle);
 
-                    // Descontar inventario nuevo
+                    // Descontar inventario correctamente
                     apiProductos2.actualizarInventario(
-                            fila.cmbProducto.getValue().getClave(),
-                            -fila.getCantidad());
+                            entry.getKey(),
+                            -entry.getValue()
+                    );
                 }
             }
 
