@@ -10,7 +10,7 @@ import java.util.List;
 
 public class EmpleadosAPI {
 
-    private static final String BASE = "http://localhost:8080/api/empleados";
+    private static final String BASE = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/empleados";
     private final HttpClient client = HttpClient.newHttpClient();
     private final Gson gson = new Gson();
 

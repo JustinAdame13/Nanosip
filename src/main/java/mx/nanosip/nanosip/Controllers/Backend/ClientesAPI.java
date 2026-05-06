@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ClientesAPI {
 
-    private static final String BASE = "http://localhost:8080/api/clientes";
+    private static final String BASE = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/clientes";
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
 

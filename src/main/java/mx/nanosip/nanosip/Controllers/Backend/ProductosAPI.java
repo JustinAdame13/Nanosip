@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ProductosAPI {
 
-    private static final String BASE = "http://localhost:8080/api/productos";
+    private static final String BASE = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos";
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
 
@@ -65,7 +65,7 @@ public class ProductosAPI {
 
     public static List<Productos> obtenerTodos() throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/productos"))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos"))
                 .GET()
                 .build();
 
@@ -82,7 +82,7 @@ public class ProductosAPI {
         String json = String.format("{\"claveProducto\":%d, \"idProveedor\":%d}", claveProducto, idProveedor);
 
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/productos-proveedores"))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
@@ -92,7 +92,7 @@ public class ProductosAPI {
 
     public void eliminarProveedoresDeProducto(int claveProducto) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/productos-proveedores/producto/" + claveProducto))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores" + claveProducto))
                 .DELETE()
                 .build();
 
@@ -105,7 +105,7 @@ public class ProductosAPI {
 
     public List<Integer> obtenerIdsProveedoresPorProducto(int claveProducto) throws Exception {
         // CAMBIO: Quitar el "?claveProducto=" y usar "/" para que coincida con @PathVariable
-        String url = "http://localhost:8080/api/productos-proveedores/producto/" + claveProducto;
+        String url = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores" + claveProducto;
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(url))

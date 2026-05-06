@@ -10,7 +10,7 @@ import java.util.List;
 
 public class VentasAPI {
 
-    private static final String BASE = "http://localhost:8080/api/ventas";
+    private static final String BASE = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas";
     private static final HttpClient client = HttpClient.newHttpClient();
 
     private static final Gson gson = new GsonBuilder()
@@ -92,7 +92,7 @@ public class VentasAPI {
     public void guardarDetalle(VentasProductos detalle) throws Exception {
         String json = gson.toJson(detalle);
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/ventas-productos"))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
@@ -103,7 +103,7 @@ public class VentasAPI {
     // ── Eliminar detalles ────────────────────────────────────
     public void eliminarDetalles(int numeroVenta) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos" + numeroVenta))
                 .DELETE()
                 .build();
 
@@ -117,7 +117,7 @@ public class VentasAPI {
     // ── Obtener detalles ─────────────────────────────────────
     public List<VentasProductos> obtenerDetalles(int numeroVenta) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/ventas-productos/venta/" + numeroVenta))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos" + numeroVenta))
                 .GET()
                 .build();
 
