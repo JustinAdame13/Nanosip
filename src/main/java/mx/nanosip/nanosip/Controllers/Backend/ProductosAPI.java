@@ -92,7 +92,7 @@ public class ProductosAPI {
 
     public void eliminarProveedoresDeProducto(int claveProducto) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores" + claveProducto))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores/producto/" + claveProducto))
                 .DELETE()
                 .build();
 
@@ -105,7 +105,7 @@ public class ProductosAPI {
 
     public List<Integer> obtenerIdsProveedoresPorProducto(int claveProducto) throws Exception {
         // CAMBIO: Quitar el "?claveProducto=" y usar "/" para que coincida con @PathVariable
-        String url = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores" + claveProducto;
+        String url = "https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/productos-proveedores/producto/" + claveProducto;
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(url))
