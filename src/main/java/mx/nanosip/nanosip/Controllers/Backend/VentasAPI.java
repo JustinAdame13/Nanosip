@@ -103,7 +103,7 @@ public class VentasAPI {
     // ── Eliminar detalles ────────────────────────────────────
     public void eliminarDetalles(int numeroVenta) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos" + numeroVenta))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos/venta/" + numeroVenta))
                 .DELETE()
                 .build();
 
@@ -117,7 +117,7 @@ public class VentasAPI {
     // ── Obtener detalles ─────────────────────────────────────
     public List<VentasProductos> obtenerDetalles(int numeroVenta) throws Exception {
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos" + numeroVenta))
+                .uri(URI.create("https://nanozip-api-paulo-bjgwaah5hgf9etc0.mexicocentral-01.azurewebsites.net/api/ventas-productos/venta/" + numeroVenta))
                 .GET()
                 .build();
 
