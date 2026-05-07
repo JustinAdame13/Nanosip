@@ -14,6 +14,9 @@ import mx.nanosip.nanosip.App;
 import mx.nanosip.nanosip.Controllers.Modals.ModalController;
 import mx.nanosip.nanosip.WindowDragUtil;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
@@ -30,6 +33,7 @@ public abstract class BaseController {
     @FXML protected HBox      topbar;
 
     @FXML protected Button btnMaximizar;
+    @FXML protected ImageView imgMaximizar;
 
     private static final double DOCK_FULL        = 56.0;
     private static final double DOCK_HIDDEN      = 8.0;
@@ -85,12 +89,24 @@ public abstract class BaseController {
         Stage stage = (Stage) topbar.getScene().getWindow();
         if (stage != null) stage.setIconified(true);
     }
-    @FXML public void maximizar() {
+    @FXML
+    public void maximizar() {
+
         Stage stage = (Stage) topbar.getScene().getWindow();
+
         if (stage != null) {
+
             boolean maximizado = stage.isMaximized();
+
             stage.setMaximized(!maximizado);
-            btnMaximizar.setText(maximizado ? "▢" : "❐");
+
+            String icono = maximizado
+                    ? "/mx/nanosip/nanosip/images/max.png"
+                    : "/mx/nanosip/nanosip/images/min.png";
+
+            imgMaximizar.setImage(
+                    new Image(getClass().getResourceAsStream(icono))
+            );
         }
     }
 

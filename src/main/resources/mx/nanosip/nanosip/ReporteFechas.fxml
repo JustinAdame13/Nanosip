@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <BorderPane prefHeight="240.0" prefWidth="360.0"
             stylesheets="@Styles.css"
             xmlns="http://javafx.com/javafx/25"
@@ -22,7 +24,16 @@
             <padding><Insets bottom="8" left="16" right="8" top="8"/></padding>
             <Label styleClass="topbar-title" text="Rango de Fechas — Reporte"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button onAction="#cancelar" styleClass="wmbtn, wmbtn-close" text="✕"/>
+            <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cancelar" styleClass="window-btn">
+
+                <graphic>
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                        <image>
+                            <Image url="@images/close.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
     </top>
 
@@ -32,13 +43,13 @@
 
             <VBox spacing="4">
                 <Label styleClass="form-label" text="Fecha de inicio"/>
-                <DatePicker fx:id="dpInicio" styleClass="login-field"
+                <DatePicker fx:id="dpInicio" styleClass="date-picker"
                             maxWidth="Infinity"/>
             </VBox>
 
             <VBox spacing="4">
                 <Label styleClass="form-label" text="Fecha de fin"/>
-                <DatePicker fx:id="dpFin" styleClass="login-field"
+                <DatePicker fx:id="dpFin" styleClass="date-picker"
                             maxWidth="Infinity"/>
             </VBox>
 

@@ -14,6 +14,8 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <BorderPane prefHeight="640.0" prefWidth="580.0"
             stylesheets="@Styles.css"
             xmlns="http://javafx.com/javafx/25"
@@ -27,8 +29,17 @@
             <padding><Insets bottom="8" left="16" right="8" top="8"/></padding>
             <Label fx:id="lblTitulo" styleClass="topbar-title" text="Nuevo Empleado"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─"/>
-            <Button onAction="#cerrarModal" styleClass="wmbtn, wmbtn-close" text="✕"/>
+
+            <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrarModal" styleClass="window-btn">
+
+                <graphic>
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                        <image>
+                            <Image url="@images/close.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
     </top>
 

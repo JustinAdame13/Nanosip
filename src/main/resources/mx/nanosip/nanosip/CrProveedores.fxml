@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <BorderPane prefHeight="340.0" prefWidth="380.0"
             stylesheets="@Styles.css"
             xmlns="http://javafx.com/javafx/25"
@@ -23,7 +25,16 @@
             <Label fx:id="lblTitulo" styleClass="topbar-title" text="Nuevo Proveedor"/>
             <Region HBox.hgrow="ALWAYS"/>
 
-            <Button onAction="#cerrarModal" styleClass="wmbtn, wmbtn-close" text="✕"/>
+            <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrarModal" styleClass="window-btn">
+
+                <graphic>
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                        <image>
+                            <Image url="@images/close.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
     </top>
 

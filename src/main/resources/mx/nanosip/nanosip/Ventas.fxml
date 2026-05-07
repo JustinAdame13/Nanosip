@@ -11,6 +11,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <BorderPane prefHeight="620.0" prefWidth="900.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.VentasController" styleClass="root-pane">
 
     <!-- ═══════════════════════════════════════════
@@ -35,9 +37,55 @@
             <HBox prefWidth="16" />
 
             <!-- Minimizar / Cerrar -->
-            <Button fx:id="btnMinimizar" onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─" />
-            <Button fx:id="btnMaximizar" onAction="#maximizar" styleClass="wmbtn, wmbtn-max" text="▢" />
-            <Button fx:id="btnCerrar" onAction="#cerrar" styleClass="wmbtn, wmbtn-close" text="✕" />
+            <Button fx:id="btnMinimizar"
+                    onAction="#minimizar"
+                    styleClass="window-btn">
+
+                <graphic>
+                    <ImageView fitHeight="14"
+                               fitWidth="14"
+                               preserveRatio="true">
+
+                        <image>
+                            <Image url="@images/minimize.png"/>
+                        </image>
+
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button fx:id="btnMaximizar"
+                    onAction="#maximizar"
+                    styleClass="window-btn">
+
+                <graphic>
+                    <ImageView fx:id="imgMaximizar"
+                               fitHeight="20"
+                               fitWidth="20"
+                               preserveRatio="true">
+
+                        <image>
+                            <Image url="@images/max.png"/>
+                        </image>
+
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button fx:id="btnCerrar"
+                    onAction="#cerrar"
+                    styleClass="window-btn">
+
+                <graphic>
+                    <ImageView fitHeight="14"
+                               fitWidth="14"
+                               preserveRatio="true">
+
+                        <image>
+                            <Image url="@images/close.png"/>
+                        </image>
+
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
     </top>
 

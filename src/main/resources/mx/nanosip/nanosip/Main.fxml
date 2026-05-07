@@ -5,13 +5,33 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="topbar" prefHeight="85.0" prefWidth="650.0" styleClass="root-pane, Main-bar" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.MainController">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox fx:id="topbar" prefHeight="85.0" prefWidth="650.0" styleClass="root-pane, menubar" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.nanosip.nanosip.Controllers.MainController">
 
    <!-- Controles de ventana (Minimizar / Cerrar) -->
    <HBox alignment="CENTER_RIGHT" spacing="8">
       <padding><Insets right="12" top="8"/></padding>
-      <Button fx:id="btnMinimizar" onAction="#minimizar" styleClass="wmbtn, wmbtn-min" text="─" />
-      <Button fx:id="btnCerrar" onAction="#cerrar" styleClass="wmbtn, wmbtn-close" text="✕" />
+      <Button fx:id="btnMinimizar" mnemonicParsing="false" onAction="#minimizar" styleClass="window-btn">
+
+         <graphic>
+            <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+               <image>
+                  <Image url="@images/minimize.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrar" styleClass="window-btn">
+
+         <graphic>
+            <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+               <image>
+                  <Image url="@images/close.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </HBox>
 
    <!-- Botones de los Módulos -->
